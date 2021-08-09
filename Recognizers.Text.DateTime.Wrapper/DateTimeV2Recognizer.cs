@@ -21,6 +21,7 @@ using Recognizers.Text.DateTime.Wrapper.Models.Enums;
 using Recognizers.Text.DateTime.Wrapper.Models.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.Linq;
 
 namespace Microsoft.Recognizers.Text.Wrapper
@@ -62,8 +63,8 @@ namespace Microsoft.Recognizers.Text.Wrapper
 
         }
 
-        private static readonly Dictionary<(string, Type), DateTimeV2Recognizer> cached = new();
-
+        private static readonly ConcurrentDictionary<(string, Type), DateTimeV2Recognizer> cached = new();
+        
         public static IEnumerable<DateTimeV2Model> RecognizeDateTimes(
             string content,
             string culture = Culture.English,
@@ -73,11 +74,7 @@ namespace Microsoft.Recognizers.Text.Wrapper
             )
         {
             Type type = factory == null ? typeof(BclDateTimeV2ObjectFactory) : factory.GetType();
-            if (!cached.TryGetValue((culture, type), out DateTimeV2Recognizer? recognizer))
-            {
-                cached[(culture, type)] = new DateTimeV2Recognizer(culture, factory);
-                recognizer = cached[(culture, type)];
-            }
+            DateTimeV2Recognizer recognizer = cached.GetOrAdd((culture, type), e => new DateTimeV2Recognizer(e.Item1, factory));
 
             return recognizer.RecognizeDateTimes(content, refTime, typeFilter);
         }
