@@ -19,6 +19,10 @@ using System.Collections.Immutable;
 
 namespace Recognizers.Text.Wrapper
 {
+    /// <summary>
+    /// A value that holds an enumerable of values for a Resolution
+    /// </summary>
+    /// <typeparam name="TValues">The type of each kind of value in a resolution</typeparam>
     public class MultiResolution<TValues> : Resolution
     {
         /// <summary>

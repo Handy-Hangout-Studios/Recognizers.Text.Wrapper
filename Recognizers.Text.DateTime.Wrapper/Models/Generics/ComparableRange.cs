@@ -19,7 +19,7 @@ using System;
 namespace Recognizers.Text.DateTime.Wrapper.Models.Generics
 {
     /// <summary>
-    /// Represents a range of generics
+    /// Represents a range of comparable generics
     /// </summary>
     /// <typeparam name="TRangeType">A type for the range.</typeparam>
     public struct ComparableRange<TRangeType> : IEquatable<ComparableRange<TRangeType>> where TRangeType : notnull, IComparable<TRangeType>

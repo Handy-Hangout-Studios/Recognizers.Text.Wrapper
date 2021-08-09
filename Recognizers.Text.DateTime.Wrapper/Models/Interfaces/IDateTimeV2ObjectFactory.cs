@@ -22,6 +22,12 @@ namespace Recognizers.Text.DateTime.Wrapper.Models.Interfaces
 {
     public interface IDateTimeV2ObjectFactory
     {
+        /// <summary>
+        /// Convert IDictionary from the DateTimeV2 Value into the corresponding DateTimeV2Object 
+        /// </summary>
+        /// <param name="type">The DateTimeV2Object to create</param>
+        /// <param name="dict">The dictionary of values used to create the DateTimeV2Object</param>
+        /// <returns>The appropriate DateTimeV2Object for that DateTimeV2Type</returns>
         public DateTimeV2Object Create(DateTimeV2Type type, IDictionary<string, string> dict);
     }
 }

@@ -21,6 +21,12 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Recognizers.Text.Wrapper
 {
+    /// <summary>
+    /// A Abstract Base Class <see cref="Microsoft.Recognizers.Text.ModelResult"/> wrapper that can be used for any kind of 
+    /// <see cref="Microsoft.Recognizers.Text.ModelResult"/> for any kind of Microsoft Recognizer.
+    /// </summary>
+    /// <typeparam name="TResolution">The Type of Resolution that is being used here</typeparam>
+    /// <typeparam name="TEnum">The Enum representing the types used for this kind of Recognizer Object</typeparam>
     public abstract class RecognizerObjectModel<TResolution, TEnum>
         where TEnum : Enum
         where TResolution : notnull, Resolution
@@ -76,9 +82,17 @@ namespace Recognizers.Text.Wrapper
             this.InitializeResolution(modelResult.Resolution);
         }
 
+        /// <summary>
+        /// Initialize the Resolution Field with a nonnull value
+        /// </summary>
+        /// <param name="resolution"></param>
         [MemberNotNull("Resolution")]
         protected abstract void InitializeResolution(IDictionary<string, object> resolution);
 
+        /// <summary>
+        /// Initialize the Type Field with a nonnull value
+        /// </summary>
+        /// <param name="typename"></param>
         [MemberNotNull("Type")]
         protected abstract void InitializeType(string typename);
     }

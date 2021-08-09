@@ -16,7 +16,12 @@
 
 namespace Recognizers.Text.Wrapper
 {
-    public class SingleResolution<TValue, TSubType> : Resolution
+    /// <summary>
+    /// A value that holds a single value and it's Type
+    /// </summary>
+    /// <typeparam name="TValue">The Type of value that is being returned for this Resolution</typeparam>
+    /// <typeparam name="TSubType">The Types that are availabe for this kind of resolution</typeparam>
+    public sealed class SingleResolution<TValue, TSubType> : Resolution
     {
         /// <summary>
         /// The subtype of resolution value that this value is.
