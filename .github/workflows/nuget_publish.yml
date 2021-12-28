@@ -1,0 +1,53 @@
+# This is a basic workflow to help you get started with Actions
+
+name: CI
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the main branch
+  push:
+    branches: [ main ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  publish:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+
+      - name: Setup dotnet
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 6.0.x
+      - name: Publish Recognizers.Text.Wrapper to NuGet
+        uses: brandedoutcast/publish-nuget@v2.5.5
+        with:
+          PROJECT_FILE_PATH: Recognizers.Text.Wrapper/Recognizers.Text.Wrapper.csproj
+          VERSION_FILE_PATH: VERSION
+          VERSION_REGEX: ^(\d*\.\d*\.\d*)$
+          NUGET_KEY: ${{secrets.NUGET_API_KEY}}
+          INCLUDE_SYMBOLS: true
+      - name: Publish Recognizers.Text.DateTime.Wrapper to NuGet
+        uses: brandedoutcast/publish-nuget@v2.5.5
+        with:
+          PROJECT_FILE_PATH: Recognizers.Text.DateTime.Wrapper/Recognizers.Text.DateTime.Wrapper.csproj
+          VERSION_FILE_PATH: VERSION
+          VERSION_REGEX: ^(\d*\.\d*\.\d*)$
+          NUGET_KEY: ${{secrets.NUGET_API_KEY}}
+          INCLUDE_SYMBOLS: true
+      - name: Publish Recognizers.Text.DateTime.Wrapper.NodaTime to NuGet
+        uses: brandedoutcast/publish-nuget@v2.5.5
+        with:
+          PROJECT_FILE_PATH: Recognizers.Text.DateTime.Wrapper.NodaTime/Recognizers.Text.DateTime.Wrapper.NodaTime.csproj
+          VERSION_FILE_PATH: VERSION
+          VERSION_REGEX: ^(\d*\.\d*\.\d*)$
+          NUGET_KEY: ${{secrets.NUGET_API_KEY}}
+          INCLUDE_SYMBOLS: true
