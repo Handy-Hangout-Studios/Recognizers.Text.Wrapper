@@ -19,28 +19,30 @@ using Recognizers.Text.DateTime.Wrapper.Models.Generics;
 using System;
 using System.Collections.Generic;
 
-namespace Recognizers.Text.DateTime.Wrapper.Models.BclDateTime
+namespace Recognizers.Text.DateTime.Wrapper.Models.BclDateTime;
+
+/// <summary>
+///     A DateTime GenericRange that contains a Start DateTime and an End DateTime. Do not use the Date component from
+///     either the Start or End DateTime.
+/// </summary>
+public class DateTimeV2TimeRange : DateTimeV2ObjectWithValue<ComparableRange<System.DateTime>>
 {
-    /// <summary>
-    /// A DateTime GenericRange that contains a Start DateTime and an End DateTime. Do not use the Date component from either the Start or End DateTime.
-    /// </summary>
-    public class DateTimeV2TimeRange : DateTimeV2ObjectWithValue<ComparableRange<System.DateTime>>
+    internal DateTimeV2TimeRange(IDictionary<String, String> value) : base(value) { }
+
+    protected override void InitializeValue(IDictionary<String, String> value)
     {
-        internal DateTimeV2TimeRange(IDictionary<String, String> value) : base(value) { }
-
-        protected override void InitializeValue(IDictionary<String, String> value)
+        if (!System.DateTime.TryParseExact(value["start"], "HH:mm:ss", null, default,
+                out System.DateTime start))
         {
-            if (!System.DateTime.TryParseExact(value["start"], "HH:mm:ss", null, default, out System.DateTime start))
-            {
-                throw new ArgumentException($"start value {value["start"]} is not in the format HH:mm:ss");
-            }
-
-            if (!System.DateTime.TryParseExact(value["end"], "HH:mm:ss", null, default, out System.DateTime end))
-            {
-                throw new ArgumentException($"end value {value["end"]} is not in the format HH:mm:ss");
-            }
-
-            this.Value = new ComparableRange<System.DateTime>(start, end);
+            throw new ArgumentException($"start value {value["start"]} is not in the format HH:mm:ss");
         }
+
+        if (!System.DateTime.TryParseExact(value["end"], "HH:mm:ss", null, default,
+                out System.DateTime end))
+        {
+            throw new ArgumentException($"end value {value["end"]} is not in the format HH:mm:ss");
+        }
+
+        this.Value = new ComparableRange<System.DateTime>(start, end);
     }
 }

@@ -14,29 +14,31 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-namespace Recognizers.Text.Wrapper
+using System;
+
+namespace Recognizers.Text.Wrapper;
+
+/// <summary>
+///     A value that holds a single value and it's Type
+/// </summary>
+/// <typeparam name="TValue">The Type of value that is being returned for this Resolution</typeparam>
+/// <typeparam name="TSubType">The Types that are available for this kind of resolution</typeparam>
+public sealed class SingleResolution<TValue, TSubType> : Resolution
+    where TSubType : Enum
 {
-    /// <summary>
-    /// A value that holds a single value and it's Type
-    /// </summary>
-    /// <typeparam name="TValue">The Type of value that is being returned for this Resolution</typeparam>
-    /// <typeparam name="TSubType">The Types that are availabe for this kind of resolution</typeparam>
-    public sealed class SingleResolution<TValue, TSubType> : Resolution
+    public SingleResolution(TValue value, TSubType subtype)
     {
-        /// <summary>
-        /// The subtype of resolution value that this value is.
-        /// </summary>
-        public TSubType SubType { get; private set; }
-
-        /// <summary>
-        /// The value of the resolution.
-        /// </summary>
-        public TValue Value { get; private set; }
-
-        public SingleResolution(TValue value, TSubType subtype)
-        {
-            this.Value = value;
-            this.SubType = subtype;
-        }
+        this.Value = value;
+        this.SubType = subtype;
     }
+
+    /// <summary>
+    ///     The subtype of resolution value that this value is.
+    /// </summary>
+    public TSubType SubType { get; }
+
+    /// <summary>
+    ///     The value of the resolution.
+    /// </summary>
+    public TValue Value { get; }
 }

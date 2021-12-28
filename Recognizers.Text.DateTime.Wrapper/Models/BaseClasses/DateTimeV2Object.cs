@@ -17,25 +17,25 @@
 using Microsoft.Recognizers.Text.DataTypes.TimexExpression;
 using System.Collections.Generic;
 
-namespace Recognizers.Text.DateTime.Wrapper.Models.BaseClasses
-{
-    /// <summary>
-    /// The DateTimeV2 objects base class. Contains the Timex expression of the recognized value
-    /// </summary>
-    public abstract class DateTimeV2Object
-    {
-        /// <summary>
-        /// The Timex value of the DateTimeV2 object recognized by the recognizer.
-        /// </summary>
-        public TimexProperty Timex { get; init; }
-        private DateTimeV2Object()
-        {
-            this.Timex = null!;
-        }
+namespace Recognizers.Text.DateTime.Wrapper.Models.BaseClasses;
 
-        protected DateTimeV2Object(IDictionary<string, string> value)
-        {
-            this.Timex = new TimexProperty(value["timex"]);
-        }
+/// <summary>
+///     The DateTimeV2 objects base class. Contains the Timex expression of the recognized value
+/// </summary>
+public abstract class DateTimeV2Object
+{
+    private DateTimeV2Object()
+    {
+        this.Timex = null!;
     }
+
+    protected DateTimeV2Object(IDictionary<string, string> value)
+    {
+        this.Timex = new TimexProperty(value["timex"]);
+    }
+
+    /// <summary>
+    ///     The Timex value of the DateTimeV2 object recognized by the recognizer.
+    /// </summary>
+    public TimexProperty Timex { get; }
 }

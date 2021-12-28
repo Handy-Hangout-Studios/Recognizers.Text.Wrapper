@@ -16,60 +16,63 @@
 
 using System;
 
-namespace Recognizers.Text.DateTime.Wrapper.Models.Generics
+namespace Recognizers.Text.DateTime.Wrapper.Models.Generics;
+
+/// <summary>
+///     Represents a range of comparable generics
+/// </summary>
+/// <typeparam name="TRangeType">A type for the range.</typeparam>
+public struct ComparableRange<TRangeType> : IEquatable<ComparableRange<TRangeType>>
+    where TRangeType : notnull, IComparable<TRangeType>
 {
     /// <summary>
-    /// Represents a range of comparable generics
+    ///     Start of the range of generics
     /// </summary>
-    /// <typeparam name="TRangeType">A type for the range.</typeparam>
-    public struct ComparableRange<TRangeType> : IEquatable<ComparableRange<TRangeType>> where TRangeType : notnull, IComparable<TRangeType>
+    public TRangeType Start { get; }
+
+    /// <summary>
+    ///     End of the range of generics
+    /// </summary>
+    public TRangeType End { get; }
+
+    public ComparableRange(TRangeType start, TRangeType end)
     {
-        /// <summary>
-        /// Start of the range of generics
-        /// </summary>
-        public TRangeType Start { get; private set; }
-
-        /// <summary>
-        /// End of the range of generics
-        /// </summary>
-        public TRangeType End { get; private set; }
-
-        public ComparableRange(TRangeType start, TRangeType end)
+        if (start.CompareTo(end) > 0)
         {
-            if (start.CompareTo(end) > 0)
-            {
-                throw new ArgumentException($"{start} is greater than {end} which is not supported");
-            }
-            this.Start = start;
-            this.End = end;
+            throw new ArgumentException($"{start} is greater than {end} which is not supported");
         }
 
-        public bool Equals(ComparableRange<TRangeType> other)
+        this.Start = start;
+        this.End = end;
+    }
+
+    public bool Equals(ComparableRange<TRangeType> other)
+    {
+        return this.Start.Equals(other.Start) && this.End.Equals(other.End);
+    }
+
+    public override bool Equals(object? obj)
+    {
+        if (obj is ComparableRange<TRangeType> second)
         {
-            return this.Start.Equals(other.Start) && this.End.Equals(other.End);
+            return this.Equals(second);
         }
 
-        public override bool Equals(object? obj)
-        {
-            if (obj is ComparableRange<TRangeType> second)
-                return this.Equals(second);
+        return base.Equals(obj);
+    }
 
-            return base.Equals(obj);
-        }
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(this.Start, this.End);
+    }
 
-        public override int GetHashCode()
-        {
-            return base.GetHashCode();
-        }
+    public static bool operator ==(ComparableRange<TRangeType> left, ComparableRange<TRangeType> right)
+    {
+        return left.Equals(right);
+    }
 
-        public static bool operator ==(ComparableRange<TRangeType> left, ComparableRange<TRangeType> right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(ComparableRange<TRangeType> left, ComparableRange<TRangeType> right)
-        {
-            return !(left == right);
-        }
+    public static bool operator !=(ComparableRange<TRangeType> left, ComparableRange<TRangeType> right)
+    {
+        return !(left == right);
     }
 }

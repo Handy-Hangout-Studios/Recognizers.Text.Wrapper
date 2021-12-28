@@ -17,22 +17,25 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 
-namespace Recognizers.Text.Wrapper
+namespace Recognizers.Text.Wrapper;
+
+/// <summary>
+///     A value that holds an enumerable of values for a Resolution
+/// </summary>
+/// <typeparam name="TValues">The type of each kind of value in a resolution</typeparam>
+public class MultiResolution<TValues> : Resolution
 {
     /// <summary>
-    /// A value that holds an enumerable of values for a Resolution
+    ///     Create a multiresolution of many values
     /// </summary>
-    /// <typeparam name="TValues">The type of each kind of value in a resolution</typeparam>
-    public class MultiResolution<TValues> : Resolution
+    /// <param name="values">All of the values represented by this resolution</param>
+    public MultiResolution(IEnumerable<TValues> values)
     {
-        /// <summary>
-        /// The enumerable of all values which are found by the recognizer. 
-        /// </summary>
-        public IEnumerable<TValues> Values { get; private set; }
-
-        public MultiResolution(IEnumerable<TValues> values)
-        {
-            this.Values = values.ToImmutableList();
-        }
+        this.Values = values.ToImmutableList();
     }
+
+    /// <summary>
+    ///     The enumerable of all values which are found by the recognizer.
+    /// </summary>
+    public IEnumerable<TValues> Values { get; }
 }

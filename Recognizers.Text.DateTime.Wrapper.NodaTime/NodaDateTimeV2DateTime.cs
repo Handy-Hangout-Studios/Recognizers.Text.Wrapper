@@ -16,27 +16,30 @@
 
 using NodaTime;
 using NodaTime.Text;
+using Recognizers.Text.DateTime.Wrapper.Models.BaseClasses;
 using System;
 using System.Collections.Generic;
 
-namespace Recognizers.Text.DateTime.Wrapper.NodaTime
-{
-    /// <summary>
-    /// A DateTime Value containing the LocalDateTime recognized.
-    /// </summary>
-    public class NodaDateTimeV2DateTime : DateTimeV2ObjectWithValue<LocalDateTime>
-    {
-        internal NodaDateTimeV2DateTime(IDictionary<string, string> value) : base(value) { }
+namespace Recognizers.Text.DateTime.Wrapper.NodaTime;
 
-        protected override void InitializeValue(IDictionary<string, string> value)
+/// <summary>
+///     A DateTime Value containing the LocalDateTime recognized.
+/// </summary>
+public class NodaDateTimeV2DateTime : DateTimeV2ObjectWithValue<LocalDateTime>
+{
+    internal NodaDateTimeV2DateTime(IDictionary<string, string> value) : base(value) { }
+
+    protected override void InitializeValue(IDictionary<string, string> value)
+    {
+        LocalDateTimePattern pattern = LocalDateTimePattern.CreateWithInvariantCulture("uuuu-MM-dd HH:mm:ss");
+        ParseResult<LocalDateTime> dateTimeParsed = pattern.Parse(value["value"]);
+        if (!dateTimeParsed.TryGetValue(LocalDate.MinIsoValue + LocalTime.MinValue, out LocalDateTime result))
         {
-            LocalDateTimePattern pattern = LocalDateTimePattern.CreateWithInvariantCulture("uuuu-MM-dd HH:mm:ss");
-            ParseResult<LocalDateTime> dateTimeParsed = pattern.Parse(value["value"]);
-            if (!dateTimeParsed.TryGetValue(LocalDate.MinIsoValue + LocalTime.MinValue, out LocalDateTime result))
-            {
-                throw new ArgumentException($"Failed to parse the value \"{value["value"]}\" with the format \"uuuu-MM-dd HH:mm:ss\"", dateTimeParsed.Exception);
-            }
-            this.Value = result;
+            throw new ArgumentException(
+                $"Failed to parse the value \"{value["value"]}\" with the format \"uuuu-MM-dd HH:mm:ss\"",
+                dateTimeParsed.Exception);
         }
+
+        this.Value = result;
     }
 }

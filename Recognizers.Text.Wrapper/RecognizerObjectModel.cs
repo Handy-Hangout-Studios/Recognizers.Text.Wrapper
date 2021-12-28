@@ -19,81 +19,93 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
-namespace Recognizers.Text.Wrapper
+namespace Recognizers.Text.Wrapper;
+
+/// <summary>
+///     A Abstract Base Class <see cref="Microsoft.Recognizers.Text.ModelResult" /> wrapper that can be used for any kind
+///     of
+///     <see cref="Microsoft.Recognizers.Text.ModelResult" /> for any kind of Microsoft Recognizer.
+/// </summary>
+/// <typeparam name="TResolution">The Type of Resolution that is being used here</typeparam>
+/// <typeparam name="TEnum">The Enum representing the types used for this kind of Recognizer Object</typeparam>
+public abstract class RecognizerObjectModel<TResolution, TEnum>
+    where TEnum : Enum
+    where TResolution : notnull, Resolution
 {
     /// <summary>
-    /// A Abstract Base Class <see cref="Microsoft.Recognizers.Text.ModelResult"/> wrapper that can be used for any kind of 
-    /// <see cref="Microsoft.Recognizers.Text.ModelResult"/> for any kind of Microsoft Recognizer.
+    ///     This is never used. If it is used, something is wrong. It's private because it should never be used.
     /// </summary>
-    /// <typeparam name="TResolution">The Type of Resolution that is being used here</typeparam>
-    /// <typeparam name="TEnum">The Enum representing the types used for this kind of Recognizer Object</typeparam>
-    public abstract class RecognizerObjectModel<TResolution, TEnum>
-        where TEnum : Enum
-        where TResolution : notnull, Resolution
+    private RecognizerObjectModel()
     {
-        /// <summary>
-        /// The Text that the recognizer was used on
-        /// </summary>
-        public string Text { get; private set; }
-
-        /// <summary>
-        /// The start of the text at which the recognizer found this resolution(s)
-        /// </summary>
-        public int Start { get; private set; }
-
-        /// <summary>
-        /// The end of the text at which the recognizer found this resolution(s)
-        /// </summary>
-        public int End { get; private set; }
-
-        /// <summary>
-        /// The type of Resolution found.
-        /// </summary>
-        public TEnum Type { get; protected set; }
-
-        /// <summary>
-        /// The resolution that was found.
-        /// </summary>
-        public TResolution Resolution { get; protected set; }
-
-        /// <summary>
-        /// This is never used. If it is used, something is wrong. It's private because it should never be used.
-        /// </summary>
-        private RecognizerObjectModel()
-        {
-            this.Text = default!;
-            this.Type = default!;
-            this.Resolution = default!;
-        }
-
-        /// <summary>
-        /// The default constructor used. 
-        /// It initializes the Text, Start, and End properties, 
-        /// and then relies on the defined InitializeType and 
-        /// InitializeResolution to initialize both of those properties.
-        /// </summary>
-        /// <param name="modelResult">The Microsoft Recognizer provided ModelResult</param>
-        protected RecognizerObjectModel(ModelResult modelResult)
-        {
-            this.Text = modelResult.Text;
-            this.Start = modelResult.Start;
-            this.End = modelResult.End;
-            this.InitializeType(modelResult.TypeName);
-            this.InitializeResolution(modelResult.Resolution);
-        }
-
-        /// <summary>
-        /// Initialize the Resolution Field with a nonnull value
-        /// </summary>
-        /// <param name="resolution"></param>
-        [MemberNotNull("Resolution")]
-        protected abstract void InitializeResolution(IDictionary<string, object> resolution);
-
-        /// <summary>
-        /// Initialize the Type Field with a nonnull value
-        /// </summary>
-        /// <param name="typename"></param>
-        [MemberNotNull("Type")]
-        protected abstract void InitializeType(string typename);
+        this.Text = default!;
+        this.Type = default!;
+        this.Resolution = default!;
     }
+
+    /// <summary>
+    ///     The default constructor used.
+    ///     It initializes the Text, Start, and End properties,
+    ///     and then relies on the defined InitializeType and
+    ///     InitializeResolution to initialize both of those properties.
+    /// </summary>
+    /// <param name="modelResult">The Microsoft Recognizer provided ModelResult</param>
+    protected RecognizerObjectModel(ModelResult modelResult)
+    {
+        this.Text = modelResult.Text;
+        this.Start = modelResult.Start;
+        this.End = modelResult.End;
+        // ReSharper disable twice VirtualMemberCallInConstructor
+        // This will not cause problems as any initialization should not rely on other initialized values in the object.
+        this.InitializeType(modelResult.TypeName);
+        this.InitializeResolution(modelResult.Resolution);
+    }
+
+    /// <summary>
+    ///     The Text that the recognizer was used on
+    /// </summary>
+    public string Text { get; }
+
+    /// <summary>
+    ///     The start of the text at which the recognizer found this resolution(s)
+    /// </summary>
+    public int Start { get; }
+
+    /// <summary>
+    ///     The end of the text at which the recognizer found this resolution(s)
+    /// </summary>
+    public int End { get; }
+
+    /// <summary>
+    ///     The type of Resolution found.
+    /// </summary>
+    public TEnum Type { get; protected set; }
+
+    /// <summary>
+    ///     The resolution that was found.
+    /// </summary>
+    public TResolution Resolution { get; protected set; }
+
+    /// <summary>
+    ///     Initialize the Resolution Field with a nonnull value
+    ///     <para>
+    ///         NOTE: Do not rely on any kind of initialized values from derived classes as the constructor for the
+    ///         base classes run before the constructor for derived classes which means that this will not be initialized
+    ///         yet
+    ///     </para>
+    /// </summary>
+    /// <param name="resolution">The dictionary of objects resolved from the model results</param>
+    [MemberNotNull("Resolution")]
+    protected abstract void InitializeResolution(IDictionary<string, object> resolution);
+
+    /// <summary>
+    ///     Initialize the Type Field with a nonnull value
+    ///     <para>
+    ///         NOTE: Do not rely on any kind of initialized values from derived classes as the constructor for the
+    ///         base classes run before the constructor for derived classes which means that this will not be initialized
+    ///         yet
+    ///     </para>
+    /// </summary>
+    /// <param name="typename">The typename extracted from the model results</param>
+    [MemberNotNull("Type")]
+    protected abstract void InitializeType(string typename);
 }

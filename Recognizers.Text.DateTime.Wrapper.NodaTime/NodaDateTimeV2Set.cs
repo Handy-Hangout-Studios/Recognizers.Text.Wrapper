@@ -14,17 +14,18 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+using Recognizers.Text.DateTime.Wrapper.Models.BaseClasses;
 using System;
 using System.Collections.Generic;
 
-namespace Recognizers.Text.DateTime.Wrapper.NodaTime
+namespace Recognizers.Text.DateTime.Wrapper.NodaTime;
+
+/// <summary>
+///     A set of Times, DateTimes, etc. Currently, the only way to interact with this is through the usage of the Timex
+///     property.
+///     For help, please ask in the support server.
+/// </summary>
+public class NodaDateTimeV2Set : DateTimeV2Object
 {
-    /// <summary>
-    /// A set of Times, DateTimes, etc. Currently, the only way to interact with this is through the usage of the Timex property. 
-    /// For help, please ask in the support server.
-    /// </summary>
-    public class NodaDateTimeV2Set : DateTimeV2Object
-    {
-        internal NodaDateTimeV2Set(IDictionary<String, String> value) : base(value) { }
-    }
+    internal NodaDateTimeV2Set(IDictionary<String, String> value) : base(value) { }
 }

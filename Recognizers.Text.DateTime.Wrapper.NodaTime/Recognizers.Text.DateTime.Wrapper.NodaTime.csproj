@@ -1,15 +1,16 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net5.0</TargetFramework>
-  </PropertyGroup>
+    <PropertyGroup>
+        <TargetFramework>net6.0</TargetFramework>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="NodaTime" Version="3.0.5" />
-  </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="NodaTime" Version="3.0.5"/>
+    </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Recognizers.Text.Wrapper\Recognizers.Text.Wrapper.csproj" />
-  </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\Recognizers.Text.DateTime.Wrapper\Recognizers.Text.DateTime.Wrapper.csproj"/>
+        <ProjectReference Include="..\Recognizers.Text.Wrapper\Recognizers.Text.Wrapper.csproj"/>
+    </ItemGroup>
 
 </Project>

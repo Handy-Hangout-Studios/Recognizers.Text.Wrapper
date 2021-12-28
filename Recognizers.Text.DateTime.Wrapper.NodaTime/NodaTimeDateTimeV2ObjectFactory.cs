@@ -14,25 +14,32 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+using Recognizers.Text.DateTime.Wrapper.Models.BaseClasses;
+using Recognizers.Text.DateTime.Wrapper.Models.Enums;
+using Recognizers.Text.DateTime.Wrapper.Models.Interfaces;
 using System;
 using System.Collections.Generic;
 
-namespace Recognizers.Text.DateTime.Wrapper.NodaTime
+namespace Recognizers.Text.DateTime.Wrapper.NodaTime;
+
+/// <summary>
+///     A factory to produce the appropriate NodaTime .NET objects for each <see cref="DateTimeV2Type" />.
+/// </summary>
+public sealed class NodaTimeDateTimeV2ObjectFactory : IDateTimeV2ObjectFactory
 {
-    public sealed class NodaTimeDateTimeV2ObjectFactory : IDateTimeV2ObjectFactory
+    DateTimeV2Object IDateTimeV2ObjectFactory.Create(DateTimeV2Type type, IDictionary<String, String> dict)
     {
-        public DateTimeV2Object Create(DateTimeV2Type type, IDictionary<String, String> dict)
-            => type switch
-            {
-                DateTimeV2Type.Date => new NodaDateTimeV2Date(dict),
-                DateTimeV2Type.DateRange => new NodaDateTimeV2DateRange(dict),
-                DateTimeV2Type.DateTime => new NodaDateTimeV2DateTime(dict),
-                DateTimeV2Type.DateTimeRange => new NodaDateTimeV2DateTimeRange(dict),
-                DateTimeV2Type.Duration => new NodaDateTimeV2Duration(dict),
-                DateTimeV2Type.Set => new NodaDateTimeV2Set(dict),
-                DateTimeV2Type.Time => new NodaDateTimeV2Time(dict),
-                DateTimeV2Type.TimeRange => new NodaDateTimeV2TimeRange(dict),
-                object o => throw new ArgumentException($"{o} is not a recognized datetime V2 type")
-            };
+        return type switch
+        {
+            DateTimeV2Type.Date => new NodaDateTimeV2Date(dict),
+            DateTimeV2Type.DateRange => new NodaDateTimeV2DateRange(dict),
+            DateTimeV2Type.DateTime => new NodaDateTimeV2DateTime(dict),
+            DateTimeV2Type.DateTimeRange => new NodaDateTimeV2DateTimeRange(dict),
+            DateTimeV2Type.Duration => new NodaDateTimeV2Duration(dict),
+            DateTimeV2Type.Set => new NodaDateTimeV2Set(dict),
+            DateTimeV2Type.Time => new NodaDateTimeV2Time(dict),
+            DateTimeV2Type.TimeRange => new NodaDateTimeV2TimeRange(dict),
+            object o => throw new ArgumentException($"{o} is not a recognized datetime V2 type"),
+        };
     }
 }

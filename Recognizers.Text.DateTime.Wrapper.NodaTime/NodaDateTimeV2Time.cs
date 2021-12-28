@@ -16,24 +16,28 @@
 
 using NodaTime;
 using NodaTime.Text;
+using Recognizers.Text.DateTime.Wrapper.Models.BaseClasses;
 using System;
 using System.Collections.Generic;
 
-namespace Recognizers.Text.DateTime.Wrapper.NodaTime
+namespace Recognizers.Text.DateTime.Wrapper.NodaTime;
+
+/// <summary>
+/// </summary>
+public class NodaDateTimeV2Time : DateTimeV2ObjectWithValue<LocalTime>
 {
-    public class NodaDateTimeV2Time : DateTimeV2ObjectWithValue<LocalTime>
+    internal NodaDateTimeV2Time(IDictionary<String, String> value) : base(value) { }
+
+    protected override void InitializeValue(IDictionary<String, String> value)
     {
-        internal NodaDateTimeV2Time(IDictionary<String, String> value) : base(value) { }
-
-        protected override void InitializeValue(IDictionary<String, String> value)
+        ParseResult<LocalTime> timeParsed =
+            LocalTimePattern.CreateWithInvariantCulture("HH:mm:ss").Parse(value["value"]);
+        if (!timeParsed.TryGetValue(LocalTime.MinValue, out LocalTime result))
         {
-            ParseResult<LocalTime> timeParsed = LocalTimePattern.CreateWithInvariantCulture("HH:mm:ss").Parse(value["value"]);
-            if (!timeParsed.TryGetValue(LocalTime.MinValue, out LocalTime result))
-            {
-                throw new ArgumentException($"Failed to parse value \"{value["value"]}\" with the format \"HH:mm:ss\"", timeParsed.Exception);
-            }
-
-            this.Value = result;
+            throw new ArgumentException($"Failed to parse value \"{value["value"]}\" with the format \"HH:mm:ss\"",
+                timeParsed.Exception);
         }
+
+        this.Value = result;
     }
 }

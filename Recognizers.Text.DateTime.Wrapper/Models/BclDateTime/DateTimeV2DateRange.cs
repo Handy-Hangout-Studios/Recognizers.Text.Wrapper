@@ -19,30 +19,31 @@ using Recognizers.Text.DateTime.Wrapper.Models.Generics;
 using System;
 using System.Collections.Generic;
 
-namespace Recognizers.Text.DateTime.Wrapper.Models.BclDateTime
+namespace Recognizers.Text.DateTime.Wrapper.Models.BclDateTime;
+
+/// <summary>
+///     A DateTime GenericRange with both a Start and End DateTime that contain the start Date and end Date recognized.
+///     Do not use the Time component of Start or End DateTimes.
+/// </summary>
+public class DateTimeV2DateRange : DateTimeV2ObjectWithValue<ComparableRange<System.DateTime>>
 {
-    /// <summary>
-    /// A DateTime GenericRange with both a Start and End DateTime that contain the start Date and end Date recognized. 
-    /// Do not use the Time component of Start or End DateTimes.
-    /// </summary>
-    public class DateTimeV2DateRange : DateTimeV2ObjectWithValue<ComparableRange<System.DateTime>>
+    internal DateTimeV2DateRange(IDictionary<string, string> value) : base(value) { }
+
+    protected override void InitializeValue(IDictionary<String, String> value)
     {
-        internal DateTimeV2DateRange(IDictionary<string, string> value) : base(value) { }
-
-        protected override void InitializeValue(IDictionary<String, String> value)
+        if (!System.DateTime.TryParseExact(value["start"], "uuuu-MM-dd", null, default,
+                out System.DateTime start))
         {
-            if (!System.DateTime.TryParseExact(value["start"], "uuuu-MM-dd", null, default, out System.DateTime start))
-            {
-                throw new ArgumentException($"start value {value["start"]} is not in the format uuuu-MM-dd");
-            }
-
-
-            if (!System.DateTime.TryParseExact(value["start"], "uuuu-MM-dd", null, default, out System.DateTime end))
-            {
-                throw new ArgumentException($"end value {value["end"]} is not in the format uuuu-MM-dd");
-            }
-
-            this.Value = new ComparableRange<System.DateTime>(start, end);
+            throw new ArgumentException($"start value {value["start"]} is not in the format uuuu-MM-dd");
         }
+
+
+        if (!System.DateTime.TryParseExact(value["start"], "uuuu-MM-dd", null, default,
+                out System.DateTime end))
+        {
+            throw new ArgumentException($"end value {value["end"]} is not in the format uuuu-MM-dd");
+        }
+
+        this.Value = new ComparableRange<System.DateTime>(start, end);
     }
 }

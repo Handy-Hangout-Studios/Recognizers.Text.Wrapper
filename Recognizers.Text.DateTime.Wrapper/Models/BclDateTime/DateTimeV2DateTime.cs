@@ -18,23 +18,23 @@ using Recognizers.Text.DateTime.Wrapper.Models.BaseClasses;
 using System;
 using System.Collections.Generic;
 
-namespace Recognizers.Text.DateTime.Wrapper.Models.BclDateTime
+namespace Recognizers.Text.DateTime.Wrapper.Models.BclDateTime;
+
+/// <summary>
+///     A DateTime Value containing the DateTime recognized.
+/// </summary>
+public class DateTimeV2DateTime : DateTimeV2ObjectWithValue<System.DateTime>
 {
-    /// <summary>
-    /// A DateTime Value containing the DateTime recognized.
-    /// </summary>
-    public class DateTimeV2DateTime : DateTimeV2ObjectWithValue<System.DateTime>
+    internal DateTimeV2DateTime(IDictionary<string, string> value) : base(value) { }
+
+    protected override void InitializeValue(IDictionary<String, String> value)
     {
-        internal DateTimeV2DateTime(IDictionary<string, string> value) : base(value) { }
-
-        protected override void InitializeValue(IDictionary<String, String> value)
+        if (!System.DateTime.TryParseExact(value["value"], "uuuu-MM-dd HH:mm:ss", null, default,
+                out System.DateTime result))
         {
-            if (!System.DateTime.TryParseExact(value["value"], "uuuu-MM-dd HH:mm:ss", null, default, out System.DateTime result))
-            {
-                throw new ArgumentException($"value {value["value"]} is not of the format uuuu-MM-dd HH:mm:ss");
-            }
-
-            this.Value = result;
+            throw new ArgumentException($"value {value["value"]} is not of the format uuuu-MM-dd HH:mm:ss");
         }
+
+        this.Value = result;
     }
 }

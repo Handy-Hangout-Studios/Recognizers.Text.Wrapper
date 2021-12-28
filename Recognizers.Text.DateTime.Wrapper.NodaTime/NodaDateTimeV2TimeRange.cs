@@ -16,31 +16,37 @@
 
 using NodaTime;
 using NodaTime.Text;
+using Recognizers.Text.DateTime.Wrapper.Models.BaseClasses;
+using Recognizers.Text.DateTime.Wrapper.Models.Generics;
 using System;
 using System.Collections.Generic;
 
-namespace Recognizers.Text.DateTime.Wrapper.NodaTime
+namespace Recognizers.Text.DateTime.Wrapper.NodaTime;
+
+/// <summary>
+/// </summary>
+public class NodaDateTimeV2TimeRange : DateTimeV2ObjectWithValue<ComparableRange<LocalTime>>
 {
-    public class NodaDateTimeV2TimeRange : DateTimeV2ObjectWithValue<DateTimeV2Range<LocalTime>>
+    internal NodaDateTimeV2TimeRange(IDictionary<String, String> value) : base(value) { }
+
+    protected override void InitializeValue(IDictionary<String, String> value)
     {
-        internal NodaDateTimeV2TimeRange(IDictionary<String, String> value) : base(value) { }
-
-        protected override void InitializeValue(IDictionary<String, String> value)
+        LocalTimePattern pattern = LocalTimePattern.CreateWithInvariantCulture("HH:mm:ss");
+        ParseResult<LocalTime> startTimeParsed = pattern.Parse(value["start"]);
+        if (!startTimeParsed.TryGetValue(LocalTime.MinValue, out LocalTime startTime))
         {
-            LocalTimePattern pattern = LocalTimePattern.CreateWithInvariantCulture("HH:mm:ss");
-            ParseResult<LocalTime> startTimeParsed = pattern.Parse(value["start"]);
-            if (!startTimeParsed.TryGetValue(LocalTime.MinValue, out LocalTime startTime))
-            {
-                throw new ArgumentException($"Failed to parse start value \"{value["start"]}\" with the format \"HH:mm:ss\"", startTimeParsed.Exception);
-            }
-
-            ParseResult<LocalTime> endTimeParsed = pattern.Parse(value["end"]);
-            if (!endTimeParsed.TryGetValue(LocalTime.MinValue, out LocalTime endTime))
-            {
-                throw new ArgumentException($"Failed to parse end value \"{value["end"]}\" with the format \"HH:mm:ss\"", endTimeParsed.Exception);
-            }
-
-            this.Value = new DateTimeV2Range<LocalTime>(startTime, endTime);
+            throw new ArgumentException(
+                $"Failed to parse start value \"{value["start"]}\" with the format \"HH:mm:ss\"",
+                startTimeParsed.Exception);
         }
+
+        ParseResult<LocalTime> endTimeParsed = pattern.Parse(value["end"]);
+        if (!endTimeParsed.TryGetValue(LocalTime.MinValue, out LocalTime endTime))
+        {
+            throw new ArgumentException($"Failed to parse end value \"{value["end"]}\" with the format \"HH:mm:ss\"",
+                endTimeParsed.Exception);
+        }
+
+        this.Value = new ComparableRange<LocalTime>(startTime, endTime);
     }
 }

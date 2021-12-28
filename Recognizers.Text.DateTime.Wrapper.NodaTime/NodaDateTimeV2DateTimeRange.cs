@@ -16,33 +16,39 @@
 
 using NodaTime;
 using NodaTime.Text;
+using Recognizers.Text.DateTime.Wrapper.Models.BaseClasses;
+using Recognizers.Text.DateTime.Wrapper.Models.Generics;
 using System;
 using System.Collections.Generic;
 
-namespace Recognizers.Text.DateTime.Wrapper.NodaTime
+namespace Recognizers.Text.DateTime.Wrapper.NodaTime;
+
+/// <summary>
+///     A DateTime DateTimeV2Range Value containing the LocalDateTime start and LocalDateTime end recognized.
+/// </summary>
+internal class NodaDateTimeV2DateTimeRange : DateTimeV2ObjectWithValue<ComparableRange<LocalDateTime>>
 {
-    /// <summary>
-    /// A DateTime DateTimeV2Range Value containing the LocalDateTime start and LocalDateTime end recognized.
-    /// </summary>
-    class NodaDateTimeV2DateTimeRange : DateTimeV2Object
+    internal NodaDateTimeV2DateTimeRange(IDictionary<string, string> value) : base(value) { }
+
+    protected override void InitializeValue(IDictionary<String, String> value)
     {
-        public DateTimeV2Range<LocalDateTime> Value { get; private set; }
-        internal NodaDateTimeV2DateTimeRange(IDictionary<string, string> value) : base(value)
+        LocalDateTimePattern pattern = LocalDateTimePattern.CreateWithInvariantCulture("uuuu-MM-dd HH:mm:ss");
+        ParseResult<LocalDateTime> startDateTimeParsed = pattern.Parse(value["start"]);
+        if (!startDateTimeParsed.TryGetValue(LocalDate.MinIsoValue + LocalTime.MinValue, out LocalDateTime startDate))
         {
-            LocalDateTimePattern pattern = LocalDateTimePattern.CreateWithInvariantCulture("uuuu-MM-dd HH:mm:ss");
-            ParseResult<LocalDateTime> startDateTimeParsed = pattern.Parse(value["start"]);
-            if (!startDateTimeParsed.TryGetValue(LocalDate.MinIsoValue + LocalTime.MinValue, out LocalDateTime startDate))
-            {
-                throw new ArgumentException($"Failed to parse the start value \"{value["start"]}\" with the format \"uuuu-MM-dd HH:mm:ss\"", startDateTimeParsed.Exception);
-            }
-
-            ParseResult<LocalDateTime> endDateTimeParsed = pattern.Parse(value["end"]);
-            if (!endDateTimeParsed.TryGetValue(LocalDate.MinIsoValue + LocalTime.MinValue, out LocalDateTime endDate))
-            {
-                throw new ArgumentException($"Failed to parse the end value \"{value["end"]}\" with the format \"uuuu-MM-dd HH:mm:ss\"", endDateTimeParsed.Exception);
-            }
-
-            this.Value = new DateTimeV2Range<LocalDateTime>(startDate, endDate);
+            throw new ArgumentException(
+                $"Failed to parse the start value \"{value["start"]}\" with the format \"uuuu-MM-dd HH:mm:ss\"",
+                startDateTimeParsed.Exception);
         }
+
+        ParseResult<LocalDateTime> endDateTimeParsed = pattern.Parse(value["end"]);
+        if (!endDateTimeParsed.TryGetValue(LocalDate.MinIsoValue + LocalTime.MinValue, out LocalDateTime endDate))
+        {
+            throw new ArgumentException(
+                $"Failed to parse the end value \"{value["end"]}\" with the format \"uuuu-MM-dd HH:mm:ss\"",
+                endDateTimeParsed.Exception);
+        }
+
+        this.Value = new ComparableRange<LocalDateTime>(startDate, endDate);
     }
 }

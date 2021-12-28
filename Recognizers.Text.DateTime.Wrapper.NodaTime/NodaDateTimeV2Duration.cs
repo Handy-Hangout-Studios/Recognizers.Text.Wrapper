@@ -15,23 +15,27 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 using NodaTime;
+using Recognizers.Text.DateTime.Wrapper.Models.BaseClasses;
 using System;
 using System.Collections.Generic;
 
-namespace Recognizers.Text.DateTime.Wrapper.NodaTime
+namespace Recognizers.Text.DateTime.Wrapper.NodaTime;
+
+/// <summary>
+///     An object containing a <see cref="Duration" /> value containing the number of seconds that were parsed out
+/// </summary>
+public class NodaDateTimeV2Duration : DateTimeV2ObjectWithValue<Duration>
 {
-    public class NodaDateTimeV2Duration : DateTimeV2ObjectWithValue<Duration>
+    internal NodaDateTimeV2Duration(IDictionary<String, String> value) : base(value) { }
+
+    protected override void InitializeValue(IDictionary<String, String> value)
     {
-        internal NodaDateTimeV2Duration(IDictionary<String, String> value) : base(value) { }
-
-        protected override void InitializeValue(IDictionary<String, String> value)
+        if (!long.TryParse(value["value"], out long result))
         {
-            if (!long.TryParse(value["value"], out long result))
-            {
-                throw new ArgumentException($"{value["value"]} is not a long corresponding to the seconds in the duration or failed to be parsed by the long parser");
-            }
-
-            this.Value = Duration.FromSeconds(result);
+            throw new ArgumentException(
+                $"{value["value"]} is not a long corresponding to the seconds in the duration or failed to be parsed by the long parser");
         }
+
+        this.Value = Duration.FromSeconds(result);
     }
 }

@@ -23,25 +23,27 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Recognizers.Text.DateTime.Wrapper.Models
+namespace Recognizers.Text.DateTime.Wrapper.Models;
+
+public sealed class DateTimeV2Model : RecognizerObjectModel<MultiResolution<DateTimeV2Object>, DateTimeV2Type>
 {
-    public sealed class DateTimeV2Model : RecognizerObjectModel<MultiResolution<DateTimeV2Object>, DateTimeV2Type>
+    private static readonly int parseStart = "datetimeV2.".Length;
+    private readonly IDateTimeV2ObjectFactory factory;
+
+    internal DateTimeV2Model(ModelResult modelResult, IDateTimeV2ObjectFactory factory) : base(modelResult)
     {
-        private static int parseStart = "datetimeV2.".Length;
-        private IDateTimeV2ObjectFactory factory;
-        internal DateTimeV2Model(ModelResult modelResult, IDateTimeV2ObjectFactory factory) : base(modelResult)
-        {
-            this.factory = factory;
-        }
+        this.factory = factory;
+    }
 
-        protected override void InitializeResolution(IDictionary<String, Object> resolution)
-        {
-            this.Resolution = new MultiResolution<DateTimeV2Object>(((List<Dictionary<string, string>>)resolution["values"]).Select(dict => this.factory.Create(this.Type, dict)));
-        }
+    protected override void InitializeResolution(IDictionary<String, Object> resolution)
+    {
+        this.Resolution = new MultiResolution<DateTimeV2Object>(
+            ((List<Dictionary<string, string>>)resolution["values"]).Select(
+                dict => this.factory.Create(this.Type, dict)));
+    }
 
-        protected override void InitializeType(String typename)
-        {
-            this.Type = Enum.Parse<DateTimeV2Type>(typename[parseStart..]);
-        }
+    protected override void InitializeType(String typename)
+    {
+        this.Type = Enum.Parse<DateTimeV2Type>(typename[parseStart..]);
     }
 }

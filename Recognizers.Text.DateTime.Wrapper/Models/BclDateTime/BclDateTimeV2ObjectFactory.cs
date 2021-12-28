@@ -20,22 +20,26 @@ using Recognizers.Text.DateTime.Wrapper.Models.Interfaces;
 using System;
 using System.Collections.Generic;
 
-namespace Recognizers.Text.DateTime.Wrapper.Models.BclDateTime
+namespace Recognizers.Text.DateTime.Wrapper.Models.BclDateTime;
+
+/// <summary>
+///     A factory to produce the appropriate BCL DateTime .NET objects for each <see cref="DateTimeV2Type" />.
+/// </summary>
+public sealed class BclDateTimeV2ObjectFactory : IDateTimeV2ObjectFactory
 {
-    public sealed class BclDateTimeV2ObjectFactory : IDateTimeV2ObjectFactory
+    DateTimeV2Object IDateTimeV2ObjectFactory.Create(DateTimeV2Type type, IDictionary<String, String> dict)
     {
-        public DateTimeV2Object Create(DateTimeV2Type type, IDictionary<String, String> dict)
-            => type switch
-            {
-                DateTimeV2Type.Date => new DateTimeV2Date(dict),
-                DateTimeV2Type.DateRange => new DateTimeV2DateRange(dict),
-                DateTimeV2Type.DateTime => new DateTimeV2DateTime(dict),
-                DateTimeV2Type.DateTimeRange => new DateTimeV2DateTimeRange(dict),
-                DateTimeV2Type.Duration => new DateTimeV2Duration(dict),
-                DateTimeV2Type.Set => new DateTimeV2Set(dict),
-                DateTimeV2Type.Time => new DateTimeV2Time(dict),
-                DateTimeV2Type.TimeRange => new DateTimeV2TimeRange(dict),
-                object o => throw new ArgumentException($"{o} is not a recognized datetime V2 type")
-            };
+        return type switch
+        {
+            DateTimeV2Type.Date => new DateTimeV2Date(dict),
+            DateTimeV2Type.DateRange => new DateTimeV2DateRange(dict),
+            DateTimeV2Type.DateTime => new DateTimeV2DateTime(dict),
+            DateTimeV2Type.DateTimeRange => new DateTimeV2DateTimeRange(dict),
+            DateTimeV2Type.Duration => new DateTimeV2Duration(dict),
+            DateTimeV2Type.Set => new DateTimeV2Set(dict),
+            DateTimeV2Type.Time => new DateTimeV2Time(dict),
+            DateTimeV2Type.TimeRange => new DateTimeV2TimeRange(dict),
+            object o => throw new ArgumentException($"{o} is not a recognized datetime V2 type"),
+        };
     }
 }

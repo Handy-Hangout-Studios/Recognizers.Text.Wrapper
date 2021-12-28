@@ -17,28 +17,34 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
-namespace Recognizers.Text.DateTime.Wrapper.Models.BaseClasses
+namespace Recognizers.Text.DateTime.Wrapper.Models.BaseClasses;
+
+/// <summary>
+///     The DateTimeV2 objects base class. Contains the Timex expression of the recognized value
+/// </summary>
+public abstract class DateTimeV2ObjectWithValue<TValue> : DateTimeV2Object where TValue : notnull
 {
-    /// <summary>
-    /// The DateTimeV2 objects base class. Contains the Timex expression of the recognized value
-    /// </summary>
-    public abstract class DateTimeV2ObjectWithValue<TValue> : DateTimeV2Object where TValue : notnull
+    protected DateTimeV2ObjectWithValue(IDictionary<string, string> value) : base(value)
     {
-        /// <summary>
-        /// The Value of the resolution found.
-        /// </summary>
-        public TValue Value { get; protected set; }
-
-        protected DateTimeV2ObjectWithValue(IDictionary<string, string> value) : base(value)
-        {
-            this.InitializeValue(value);
-        }
-
-        /// <summary>
-        /// Initialize the Value property
-        /// </summary>
-        /// <param name="value">The value dictionary with all components necessary to create a Value object</param>
-        [MemberNotNull("Value")]
-        protected abstract void InitializeValue(IDictionary<string, string> value);
+        // ReSharper disable once VirtualMemberCallInConstructor
+        // This will not cause problems as any initialization should not rely on other initialized values in the object.
+        this.InitializeValue(value);
     }
+
+    /// <summary>
+    ///     The Value of the resolution found.
+    /// </summary>
+    public TValue Value { get; protected set; }
+
+    /// <summary>
+    ///     Initialize the Value property.
+    ///     <para>
+    ///         NOTE: Do not rely on any kind of initialized values from derived classes as the constructor for the
+    ///         base classes run before the constructor for derived classes which means that this will not be initialized
+    ///         yet
+    ///     </para>
+    /// </summary>
+    /// <param name="value">The value dictionary with all components necessary to create a Value object</param>
+    [MemberNotNull("Value")]
+    protected abstract void InitializeValue(IDictionary<string, string> value);
 }

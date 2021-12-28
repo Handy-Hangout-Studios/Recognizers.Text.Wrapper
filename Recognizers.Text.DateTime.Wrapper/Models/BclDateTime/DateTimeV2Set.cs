@@ -18,14 +18,14 @@ using Recognizers.Text.DateTime.Wrapper.Models.BaseClasses;
 using System;
 using System.Collections.Generic;
 
-namespace Recognizers.Text.DateTime.Wrapper.Models.BclDateTime
+namespace Recognizers.Text.DateTime.Wrapper.Models.BclDateTime;
+
+/// <summary>
+///     A set of Times, DateTimes, etc. Currently, the only way to interact with this is through the usage of the Timex
+///     property.
+///     For help, please ask in the support server.
+/// </summary>
+public class DateTimeV2Set : DateTimeV2Object
 {
-    /// <summary>
-    /// A set of Times, DateTimes, etc. Currently, the only way to interact with this is through the usage of the Timex property. 
-    /// For help, please ask in the support server.
-    /// </summary>
-    public class DateTimeV2Set : DateTimeV2Object
-    {
-        internal DateTimeV2Set(IDictionary<String, String> value) : base(value) { }
-    }
+    internal DateTimeV2Set(IDictionary<String, String> value) : base(value) { }
 }

@@ -18,26 +18,26 @@ using Recognizers.Text.DateTime.Wrapper.Models.BaseClasses;
 using System;
 using System.Collections.Generic;
 
-namespace Recognizers.Text.DateTime.Wrapper.Models.BclDateTime
+namespace Recognizers.Text.DateTime.Wrapper.Models.BclDateTime;
+
+/// <summary>
+///     A TimeSpan Value that specifies how long the duration recognized lasts.
+/// </summary>
+public class DateTimeV2Duration : DateTimeV2ObjectWithValue<TimeSpan>
 {
-    /// <summary>
-    /// A TimeSpan Value that specifies how long the duration recognized lasts.
-    /// </summary>
-    public class DateTimeV2Duration : DateTimeV2ObjectWithValue<TimeSpan>
+    internal DateTimeV2Duration(IDictionary<String, String> value) : base(value)
     {
-        internal DateTimeV2Duration(IDictionary<String, String> value) : base(value)
+        this.Value = TimeSpan.FromSeconds(long.Parse(value["value"]));
+    }
+
+    protected override void InitializeValue(IDictionary<String, String> value)
+    {
+        if (!long.TryParse(value["value"], out long result))
         {
-            this.Value = TimeSpan.FromSeconds(long.Parse(value["value"]));
+            throw new ArgumentException(
+                $"{value["value"]} is not a long corresponding to the seconds in the duration or failed to be parsed by the long parser");
         }
 
-        protected override void InitializeValue(IDictionary<String, String> value)
-        {
-            if (!long.TryParse(value["value"], out long result))
-            {
-                throw new ArgumentException($"{value["value"]} is not a long corresponding to the seconds in the duration or failed to be parsed by the long parser");
-            }
-
-            this.Value = TimeSpan.FromSeconds(result);
-        }
+        this.Value = TimeSpan.FromSeconds(result);
     }
 }
