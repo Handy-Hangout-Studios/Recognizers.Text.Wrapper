@@ -31,20 +31,14 @@ jobs:
         uses: brandedoutcast/publish-nuget@v2.5.5
         with:
           PROJECT_FILE_PATH: Recognizers.Text.Wrapper/Recognizers.Text.Wrapper.csproj
-          VERSION_FILE_PATH: VERSION
-          VERSION_REGEX: ^(\d*\.\d*\.\d*)$
           NUGET_KEY: ${{secrets.NUGET_API_KEY}}
       - name: Publish Recognizers.Text.DateTime.Wrapper to NuGet
         uses: brandedoutcast/publish-nuget@v2.5.5
         with:
           PROJECT_FILE_PATH: Recognizers.Text.DateTime.Wrapper/Recognizers.Text.DateTime.Wrapper.csproj
-          VERSION_FILE_PATH: VERSION
-          VERSION_REGEX: ^(\d*\.\d*\.\d*)$
           NUGET_KEY: ${{secrets.NUGET_API_KEY}}
       - name: Publish Recognizers.Text.DateTime.Wrapper.NodaTime to NuGet
         uses: brandedoutcast/publish-nuget@v2.5.5
         with:
           PROJECT_FILE_PATH: Recognizers.Text.DateTime.Wrapper.NodaTime/Recognizers.Text.DateTime.Wrapper.NodaTime.csproj
-          VERSION_FILE_PATH: VERSION
-          VERSION_REGEX: ^(\d*\.\d*\.\d*)$
           NUGET_KEY: ${{secrets.NUGET_API_KEY}}
