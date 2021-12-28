@@ -34,7 +34,6 @@ jobs:
           VERSION_FILE_PATH: VERSION
           VERSION_REGEX: ^(\d*\.\d*\.\d*)$
           NUGET_KEY: ${{secrets.NUGET_API_KEY}}
-          INCLUDE_SYMBOLS: true
       - name: Publish Recognizers.Text.DateTime.Wrapper to NuGet
         uses: brandedoutcast/publish-nuget@v2.5.5
         with:
@@ -42,7 +41,6 @@ jobs:
           VERSION_FILE_PATH: VERSION
           VERSION_REGEX: ^(\d*\.\d*\.\d*)$
           NUGET_KEY: ${{secrets.NUGET_API_KEY}}
-          INCLUDE_SYMBOLS: true
       - name: Publish Recognizers.Text.DateTime.Wrapper.NodaTime to NuGet
         uses: brandedoutcast/publish-nuget@v2.5.5
         with:
@@ -50,4 +48,3 @@ jobs:
           VERSION_FILE_PATH: VERSION
           VERSION_REGEX: ^(\d*\.\d*\.\d*)$
           NUGET_KEY: ${{secrets.NUGET_API_KEY}}
-          INCLUDE_SYMBOLS: true
