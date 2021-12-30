@@ -22,11 +22,28 @@ namespace Recognizers.Text.DateTime.Wrapper.DependencyInjection;
 
 public static class Extensions
 {
+    /// <summary>
+    /// Add a singleton DateTimeV2Recognizer to the service collection
+    /// </summary>
+    /// <param name="serviceCollection">Service collection to add to</param>
+    /// <param name="culture">The culture to use for this parser</param>
+    /// <typeparam name="TFactory">The type of factory to use in producing .NET objects for each
+    /// <see cref="Recognizers.Text.DateTime.Wrapper.Models.Enums.DateTimeV2Type"/>.</typeparam>
+    /// <returns>The service collection with the singleton recognizer</returns>
+    // ReSharper disable once MemberCanBePrivate.Global
     public static IServiceCollection AddDateTimeV2Recognizer<TFactory>(this IServiceCollection serviceCollection, string culture = Culture.English)
     {
-        return serviceCollection.AddSingleton(_ => new DateTimeV2Recognizer(culture, typeof(TFactory)));
+        return serviceCollection.AddSingleton(_ => new DateTimeV2Recognizer<TFactory>(culture));
     }
 
+    /// <summary>
+    /// Add a singleton DateTimeV2Recognizer that uses the
+    /// <see cref="Recognizers.Text.DateTime.Wrapper.Models.BclDateTime.BclDateTimeV2ObjectFactory"/>>
+    /// to the service collection
+    /// </summary>
+    /// <param name="serviceCollection">Service collection to add to</param>
+    /// <param name="culture">The culture to use for this parser</param>
+    /// <returns>The service collection with the singleton recognizer</returns>
     public static IServiceCollection AddDateTimeV2Recognizer(this IServiceCollection serviceCollection, string culture = Culture.English)
         => serviceCollection.AddDateTimeV2Recognizer<BclDateTimeV2ObjectFactory>(culture);
 }

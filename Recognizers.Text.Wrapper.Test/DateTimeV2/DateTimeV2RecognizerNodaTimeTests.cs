@@ -36,15 +36,14 @@ public class DateTimeV2RecognizerNodaTimeTests
     public void TestRecognizerIgnoresInvalidDates(string content)
     {
         IEnumerable<DateTimeV2Model> results =
-            DateTimeV2Recognizer.RecognizeDateTimes(content, factory: typeof(NodaTimeDateTimeV2ObjectFactory));
+            DateTimeV2Recognizer.RecognizeDateTimes<NodaTimeDateTimeV2ObjectFactory>(content);
         Assert.IsEmpty(results);
     }
 
     [TestCase("\"Within 3 years\", he said this 5 years ago.", "2018-03-14T00:00:00", "2018-03-14", "2021-03-14")]
     public void TestDateRanges(string content, string refTime, string start, string end)
     {
-        IEnumerable<DateTimeV2Model> results = DateTimeV2Recognizer.RecognizeDateTimes(content,
-            factory: typeof(NodaTimeDateTimeV2ObjectFactory),
+        IEnumerable<DateTimeV2Model> results = DateTimeV2Recognizer.RecognizeDateTimes<NodaTimeDateTimeV2ObjectFactory>(content,
             refTime: DateTime.ParseExact(refTime, "yyyy-MM-ddTHH:mm:ss", null),
             typeFilter: new HashSet<DateTimeV2Type> {DateTimeV2Type.DateRange});
         NodaDateTimeV2DateRange result = results.First().Resolution.Values.Cast<NodaDateTimeV2DateRange>().First();

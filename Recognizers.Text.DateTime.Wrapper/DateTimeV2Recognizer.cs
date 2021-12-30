@@ -56,7 +56,7 @@ public class DateTimeV2Recognizer
 {
     /// <summary>
     ///     A cache for all <see cref="DateTimeV2Recognizer" />s of each culture and type that are used in the static method
-    ///     <see cref="DateTimeV2Recognizer.RecognizeDateTimes(string, string, System.DateTime?, Type?, ISet{DateTimeV2Type}?)" />
+    ///     <see cref="DateTimeV2Recognizer.RecognizeDateTimes{T}(string, string, System.DateTime?, ISet{DateTimeV2Type}?)" />
     ///     to help reduce costs of producing the recognizers repeatedly.
     /// </summary>
     private static readonly ConcurrentDictionary<(string culture, Type type), DateTimeV2Recognizer> Cached =
@@ -77,16 +77,14 @@ public class DateTimeV2Recognizer
     ///     Create a DateTimeV2Recognizer that can be used to parse different <see cref="DateTimeV2Type" />s from a string
     /// </summary>
     /// <param name="culture">The culture to use when parsing - Defaults to English</param>
-    /// <param name="factory">
-    ///     A factory used to produce appropriate .NET objects for each of the
+    /// <param name="factoryType">The factory type to use to produce appropriate .NET objects for each of the
     ///     <see cref="DateTimeV2Type" />s. The factory used will define what types you will be working with.
-    ///     - Defaults to an object factory that produces .NET DateTime objects
-    /// </param>
+    ///     - Defaults to an object factory that produces .NET DateTime objects</param>
     // ReSharper disable once MemberCanBePrivate.Global
-    public DateTimeV2Recognizer(string culture = Culture.English, IDateTimeV2ObjectFactory? factory = null)
+    protected DateTimeV2Recognizer(string culture = Culture.English, Type? factoryType = null)
     {
         this._model = new DateTimeRecognizer(culture).GetDateTimeModel();
-        this._factory = factory ?? new BclDateTimeV2ObjectFactory();
+        this._factory = (IDateTimeV2ObjectFactory)Activator.CreateInstance(factoryType ?? typeof(BclDateTimeV2ObjectFactory))!;
     }
 
     /// <summary>
@@ -115,6 +113,26 @@ public class DateTimeV2Recognizer
     /// <summary>
     ///     Use the Microsoft <see cref="Microsoft.Recognizers.Text.DateTime.DateTimeRecognizer" /> to parse out any
     ///     datetimes in the content string and then return them as .NET objects using the factory that was provided or the
+    ///     cached recognizer for the culture and factory type passed in if those have been used before - This overload
+    ///     uses the <see cref="BclDateTimeV2ObjectFactory"/> which produces default .NET DateTime like objects.
+    /// </summary>
+    /// <param name="content">The string to extract datetimes from</param>
+    /// <param name="culture">
+    ///     The culture to use when parsing - Also used for caching recognizers - Defaults to English
+    /// </param>
+    /// <param name="refTime">The time to use as the current time when parsing</param>
+    /// <param name="typeFilter">A set containing the <see cref="DateTimeV2Type"/>s of <see cref="Recognizers.Text.DateTime.Wrapper.Models.BaseClasses.DateTimeV2Object"/>s to return</param>
+    /// <returns></returns>
+    public static IEnumerable<DateTimeV2Model> RecognizeDateTimes(
+        string content,
+        string culture = Culture.English,
+        System.DateTime? refTime = null,
+        ISet<DateTimeV2Type>? typeFilter = null
+    ) => RecognizeDateTimes<BclDateTimeV2ObjectFactory>(content, culture, refTime, typeFilter);
+    
+    /// <summary>
+    ///     Use the Microsoft <see cref="Microsoft.Recognizers.Text.DateTime.DateTimeRecognizer" /> to parse out any
+    ///     datetimes in the content string and then return them as .NET objects using the factory that was provided or the
     ///     cached recognizer for the culture and factory type passed in if those have been used before
     /// </summary>
     /// <param name="content">The string to extract datetimes from</param>
@@ -122,27 +140,35 @@ public class DateTimeV2Recognizer
     ///     The culture to use when parsing - Also used for caching recognizers - Defaults to English
     /// </param>
     /// <param name="refTime">The time to use as the current time when parsing</param>
-    /// <param name="factory">
-    ///     The type of factory to use to produce .NET objects from the results extracted by the
-    ///     Microsoft <see cref="Microsoft.Recognizers.Text.DateTime.DateTimeRecognizer" /> - Defaults to using the
-    ///     <see cref="BclDateTimeV2ObjectFactory" /> type of factory
-    /// </param>
-    /// <param name="typeFilter"></param>
+    /// <param name="typeFilter">A set containing the <see cref="DateTimeV2Type"/>s of <see cref="Recognizers.Text.DateTime.Wrapper.Models.BaseClasses.DateTimeV2Object"/>s to return</param>
+    /// <typeparam name="TFactory">The type of factory to use in producing the .NET objects appropriate for each
+    /// <see cref="DateTimeV2Type"/>.</typeparam>
     /// <returns></returns>
-    public static IEnumerable<DateTimeV2Model> RecognizeDateTimes(
+    public static IEnumerable<DateTimeV2Model> RecognizeDateTimes<TFactory>(
         string content,
         string culture = Culture.English,
         System.DateTime? refTime = null,
-        Type? factory = null,
         ISet<DateTimeV2Type>? typeFilter = null
     )
     {
-        Type type = factory ?? typeof(BclDateTimeV2ObjectFactory);
         DateTimeV2Recognizer recognizer =
-            Cached.GetOrAdd((culture, type), e =>
-                new DateTimeV2Recognizer(e.culture, (IDateTimeV2ObjectFactory)Activator.CreateInstance(type)!)
+            Cached.GetOrAdd((culture, typeof(TFactory)), e =>
+                new DateTimeV2Recognizer<TFactory>(e.culture)
             );
 
         return recognizer.RecognizeDateTimes(content, refTime, typeFilter);
+    }
+}
+
+/// <summary>
+/// An object used to parse <see cref="DateTimeV2Model"/>s from a content sentence
+/// </summary>
+/// <typeparam name="TFactory">The type of factory to use in producing the .NET objects appropriate for each
+/// <see cref="DateTimeV2Type"/>.</typeparam>
+public class DateTimeV2Recognizer<TFactory> : DateTimeV2Recognizer
+{
+    public DateTimeV2Recognizer(string culture) : base(culture, typeof(TFactory))
+    {
+        
     }
 }
