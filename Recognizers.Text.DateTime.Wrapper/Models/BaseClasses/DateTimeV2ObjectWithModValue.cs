@@ -24,6 +24,7 @@ public abstract class DateTimeV2ObjectWithModValue<TValue, TModifier> : DateTime
     where TValue : notnull
     where TModifier : Enum
 {
+    // ReSharper disable once PublicConstructorInAbstractClass
     public DateTimeV2ObjectWithModValue(IDictionary<String, String> value) : base(value)
     {
         // ReSharper disable once VirtualMemberCallInConstructor
@@ -31,6 +32,8 @@ public abstract class DateTimeV2ObjectWithModValue<TValue, TModifier> : DateTime
         this.InitializeModifier(value);
     }
 
+    // ReSharper disable once MemberCanBeProtected.Global
+    // ReSharper disable once UnusedAutoPropertyAccessor.Global
     public TModifier Modifier { get; protected set; }
 
     [MemberNotNull("Modifier")]

@@ -23,6 +23,7 @@ using Recognizers.Text.DateTime.Wrapper.Models.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 using System.Net.Http;
 using System.Text.Json;
@@ -44,14 +45,13 @@ public class MicrosoftTests
     public void TestDeserializeMicrosoftData()
     {
         IDateTimeV2ObjectFactory factory = new BclDateTimeV2ObjectFactory();
-        string json =
-            "[{\"Input\":\"\\\"Within 3 years\\\", he said this 5 years ago.\",\"Context\":{\"ReferenceDateTime\":\"2018-03-14T00:00:00\"},\"NotSupported\":\"javascript, python\",\"Results\":[{\"Text\":\"Within 3 years\",\"Type\":\"datetimeV2.daterange\",\"Value\":{\"values\":[{\"timex\":\"(2018-03-14,2021-03-14,P3Y)\",\"type\":\"daterange\",\"start\":\"2018-03-14\",\"end\":\"2021-03-14\"}]},\"Start\":1,\"Length\":14},{\"Text\":\"5 years ago\",\"Start\":31,\"Type\":\"datetimeV2.date\",\"Value\":{\"values\":[{\"timex\":\"2013-03-14\",\"type\":\"date\",\"value\":\"2013-03-14\"}]},\"Length\":11}]}]";
+        const string json = "[{\"Input\":\"\\\"Within 3 years\\\", he said this 5 years ago.\",\"Context\":{\"ReferenceDateTime\":\"2018-03-14T00:00:00\"},\"NotSupported\":\"javascript, python\",\"Results\":[{\"Text\":\"Within 3 years\",\"Type\":\"datetimeV2.daterange\",\"Value\":{\"values\":[{\"timex\":\"(2018-03-14,2021-03-14,P3Y)\",\"type\":\"daterange\",\"start\":\"2018-03-14\",\"end\":\"2021-03-14\"}]},\"Start\":1,\"Length\":14},{\"Text\":\"5 years ago\",\"Start\":31,\"Type\":\"datetimeV2.date\",\"Value\":{\"values\":[{\"timex\":\"2013-03-14\",\"type\":\"date\",\"value\":\"2013-03-14\"}]},\"Length\":11}]}]";
         List<MicrosoftData>? data = JsonSerializer.Deserialize<List<MicrosoftData>>(json, SerializerOptions);
         Debug.Assert(data != null, nameof(data) + " != null");
         var expected = new
         {
             Input = "\"Within 3 years\", he said this 5 years ago.",
-            RefTime = DateTime.Parse("2018-03-14T00:00:00"),
+            RefTime = DateTime.Parse("2018-03-14T00:00:00", CultureInfo.GetCultureInfo(Culture.English)),
             FirstModelResult = new ModelResult
             {
                 Text = "Within 3 years",
@@ -102,10 +102,11 @@ public class MicrosoftTests
     [TestCaseSource(nameof(GetMicrosoftData))]
     public void TestParserVsMicrosoftData(MicrosoftData data)
     {
+        (String? input, DateTime dateTime, List<DateTimeV2Model>? dateTimeV2Models) = data;
         IEnumerable<DateTimeV2Model> results =
-            DateTimeV2Recognizer.RecognizeDateTimes(data.Input, refTime: data.RefTime);
+            DateTimeV2Recognizer.RecognizeDateTimes(input, refTime: dateTime);
 
-        foreach ((DateTimeV2Model first, DateTimeV2Model second) in data.Expected.Zip(results))
+        foreach ((DateTimeV2Model first, DateTimeV2Model second) in dateTimeV2Models.Zip(results))
         {
             Assert.AreEqual(first, second);
         }
@@ -124,14 +125,14 @@ public class MicrosoftTests
 
         string jsonSpec = response.Content.ReadAsStringAsync().Result;
         return JsonSerializer.Deserialize<List<MicrosoftData>>(jsonSpec, SerializerOptions) ??
-               throw new Exception("Deserialization failed to return any value");
+               throw new JsonException("Deserialization failed to return any value");
     }
 
     private class MicrosoftDataConverter : JsonConverter<List<MicrosoftData>>
     {
         private static readonly IDateTimeV2ObjectFactory Factory = new BclDateTimeV2ObjectFactory();
 
-        public override List<MicrosoftData>? Read(ref Utf8JsonReader reader, Type typeToConvert,
+        public override List<MicrosoftData> Read(ref Utf8JsonReader reader, Type typeToConvert,
             JsonSerializerOptions options)
         {
             if (reader.TokenType != JsonTokenType.StartArray)
@@ -161,7 +162,7 @@ public class MicrosoftTests
                 }
 
                 reader.Read();
-                string input = reader.GetString() ?? throw new Exception("Should not be null Input");
+                string input = reader.GetString() ?? throw new JsonException("Should not be null Input");
 
                 reader.Read();
                 // Read the Reference DateTime
@@ -237,7 +238,7 @@ public class MicrosoftTests
                             {
                                 JsonTokenType.String => reader.GetString(),
                                 JsonTokenType.Number => reader.GetInt32(),
-                                JsonTokenType.StartObject => (object)this.GetValues(ref reader, input),
+                                JsonTokenType.StartObject => (object)GetValues(ref reader, input),
                                 _ => throw new JsonException(input),
                             } ?? throw new JsonException(input);
                         reader.Read();
@@ -262,7 +263,7 @@ public class MicrosoftTests
                         refTime,
                         modelResults
                             .Select(mr => DateTimeV2Model.Create(mr, Factory))
-                            .ToList()
+                            .ToList()!
                     )
                 );
                 reader.Read();
@@ -271,7 +272,7 @@ public class MicrosoftTests
             throw new JsonException();
         }
 
-        private List<Dictionary<string, string>> GetValues(ref Utf8JsonReader reader, string input)
+        private static List<Dictionary<string, string>> GetValues(ref Utf8JsonReader reader, string input)
         {
             List<Dictionary<string, string>> temp = new();
             reader.Read();
@@ -280,7 +281,7 @@ public class MicrosoftTests
                 throw new JsonException(input);
             }
 
-            string propertyName = reader.GetString();
+            string propertyName = reader.GetString() ?? throw new JsonException();
             if (propertyName != "values")
             {
                 throw new JsonException(input);
@@ -309,9 +310,9 @@ public class MicrosoftTests
                         throw new JsonException(input);
                     }
 
-                    string key = reader.GetString();
+                    string key = reader.GetString() ?? throw new JsonException(input);
                     reader.Read();
-                    newObj[key] = reader.GetString();
+                    newObj[key] = reader.GetString() ?? throw new JsonException(input);
                     reader.Read();
                 }
 

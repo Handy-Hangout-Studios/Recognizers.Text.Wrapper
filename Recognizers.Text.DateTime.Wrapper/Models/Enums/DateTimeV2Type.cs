@@ -30,5 +30,4 @@ public enum DateTimeV2Type
     DateTime,
     Duration,
     Set,
-    Timezone,
 }

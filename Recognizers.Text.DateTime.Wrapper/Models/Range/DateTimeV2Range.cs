@@ -38,6 +38,8 @@ public readonly struct
     /// </summary>
     public TRangeType End { get; }
 
+    // ReSharper disable once MemberCanBePrivate.Global
+    // ReSharper disable once UnusedAutoPropertyAccessor.Global
     public TRangeModifier Modifier { get; }
 
     public DateTimeV2Range(TRangeModifier mod, TRangeType start, TRangeType end)

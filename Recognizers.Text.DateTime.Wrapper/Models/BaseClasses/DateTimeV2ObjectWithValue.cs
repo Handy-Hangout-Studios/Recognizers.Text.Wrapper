@@ -77,12 +77,7 @@ public abstract class DateTimeV2ObjectWithValue<TValue> : DateTimeV2Object,
             return true;
         }
 
-        if (obj.GetType() != this.GetType())
-        {
-            return false;
-        }
-
-        return this.Equals((DateTimeV2ObjectWithValue<TValue>)obj);
+        return obj.GetType() == this.GetType() && this.Equals((DateTimeV2ObjectWithValue<TValue>)obj);
     }
 
     public override int GetHashCode()

@@ -35,6 +35,7 @@ internal class StringTypeComparer : IEqualityComparer<(string culture, Type type
     /// <param name="first">The first string type value tuple</param>
     /// <param name="second">The second string type value tuple</param>
     /// <returns>Whether the two string type value tuples are equal</returns>
+    // ReSharper disable twice UseDeconstructionOnParameter
     public bool Equals((string culture, Type type) first, (string culture, Type type) second)
     {
         return first.culture == second.culture && first.type == second.type;
@@ -81,6 +82,7 @@ public class DateTimeV2Recognizer
     ///     <see cref="DateTimeV2Type" />s. The factory used will define what types you will be working with.
     ///     - Defaults to an object factory that produces .NET DateTime objects
     /// </param>
+    // ReSharper disable once MemberCanBePrivate.Global
     public DateTimeV2Recognizer(string culture = Culture.English, IDateTimeV2ObjectFactory? factory = null)
     {
         this._model = new DateTimeRecognizer(culture).GetDateTimeModel();
@@ -96,6 +98,7 @@ public class DateTimeV2Recognizer
     /// <param name="refTime">The time to use as the current time when parsing</param>
     /// <param name="typeFilter">The types of <see cref="DateTimeV2Type" />s to return</param>
     /// <returns>An enumerable of datetimes parsed from the content string</returns>
+    // ReSharper disable once MemberCanBePrivate.Global
     public IEnumerable<DateTimeV2Model> RecognizeDateTimes(string content, System.DateTime? refTime = null,
         ISet<DateTimeV2Type>? typeFilter = null)
     {

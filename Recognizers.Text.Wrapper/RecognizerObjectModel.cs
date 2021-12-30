@@ -32,22 +32,14 @@ public abstract class RecognizerObjectModel<TResolution, TEnum> : IEquatable<Rec
     where TResolution : Resolution
 {
     /// <summary>
-    ///     This is never used. If it is used, something is wrong. It's private because it should never be used.
-    /// </summary>
-    private RecognizerObjectModel()
-    {
-        this.Text = default!;
-        this.Type = default!;
-        this.Resolution = default!;
-    }
-
-    /// <summary>
     ///     The default constructor used.
     ///     It initializes the Text, Start, and End properties,
     ///     and then relies on the defined InitializeType and
     ///     InitializeResolution to initialize both of those properties.
     /// </summary>
     /// <param name="modelResult">The Microsoft Recognizer provided ModelResult</param>
+    /// <param name="type"></param>
+    /// <param name="resolution"></param>
     protected RecognizerObjectModel(ModelResult modelResult, TEnum type, TResolution resolution)
     {
         this.Text = modelResult.Text;
@@ -60,27 +52,31 @@ public abstract class RecognizerObjectModel<TResolution, TEnum> : IEquatable<Rec
     /// <summary>
     ///     The Text that the recognizer was used on
     /// </summary>
+    // ReSharper disable once MemberCanBePrivate.Global
     public string Text { get; }
 
     /// <summary>
     ///     The start of the text at which the recognizer found this resolution(s)
     /// </summary>
+    // ReSharper disable once MemberCanBePrivate.Global
     public int Start { get; }
 
     /// <summary>
     ///     The end of the text at which the recognizer found this resolution(s)
     /// </summary>
+    // ReSharper disable once MemberCanBePrivate.Global
     public int End { get; }
 
     /// <summary>
     ///     The type of Resolution found.
     /// </summary>
-    public TEnum Type { get; protected init; }
+    // ReSharper disable once MemberCanBePrivate.Global
+    public TEnum Type { get; }
 
     /// <summary>
     ///     The resolution that was found.
     /// </summary>
-    public TResolution Resolution { get; protected init; }
+    public TResolution Resolution { get; }
 
     public bool Equals(RecognizerObjectModel<TResolution, TEnum>? other)
     {
@@ -113,12 +109,7 @@ public abstract class RecognizerObjectModel<TResolution, TEnum> : IEquatable<Rec
             return true;
         }
 
-        if (obj.GetType() != this.GetType())
-        {
-            return false;
-        }
-
-        return this.Equals((RecognizerObjectModel<TResolution, TEnum>)obj);
+        return obj.GetType() == this.GetType() && this.Equals((RecognizerObjectModel<TResolution, TEnum>)obj);
     }
 
     public override int GetHashCode()

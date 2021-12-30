@@ -25,11 +25,6 @@ namespace Recognizers.Text.DateTime.Wrapper.Models.BaseClasses;
 /// </summary>
 public abstract class DateTimeV2Object : IEquatable<DateTimeV2Object>
 {
-    private DateTimeV2Object()
-    {
-        this.Timex = null!;
-    }
-
     protected DateTimeV2Object(IDictionary<string, string> value)
     {
         this.Timex = new TimexProperty(value["timex"]);
@@ -38,6 +33,7 @@ public abstract class DateTimeV2Object : IEquatable<DateTimeV2Object>
     /// <summary>
     ///     The Timex value of the DateTimeV2 object recognized by the recognizer.
     /// </summary>
+    // ReSharper disable once MemberCanBePrivate.Global
     public TimexProperty Timex { get; }
 
     public bool Equals(DateTimeV2Object? other)
@@ -47,12 +43,7 @@ public abstract class DateTimeV2Object : IEquatable<DateTimeV2Object>
             return false;
         }
 
-        if (ReferenceEquals(this, other))
-        {
-            return true;
-        }
-
-        return this.Timex.TimexValue.Equals(other.Timex.TimexValue);
+        return ReferenceEquals(this, other) || this.Timex.TimexValue.Equals(other.Timex.TimexValue);
     }
 
     public override bool Equals(object? obj)
@@ -67,12 +58,7 @@ public abstract class DateTimeV2Object : IEquatable<DateTimeV2Object>
             return true;
         }
 
-        if (obj.GetType() != this.GetType())
-        {
-            return false;
-        }
-
-        return this.Equals((DateTimeV2Object)obj);
+        return obj.GetType() == this.GetType() && this.Equals((DateTimeV2Object)obj);
     }
 
     public override int GetHashCode()
