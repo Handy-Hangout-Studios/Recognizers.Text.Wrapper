@@ -20,6 +20,11 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Recognizers.Text.DateTime.Wrapper.Models.BaseClasses;
 
+/// <summary>
+/// A <see cref="DateTimeV2Object"/> containing a value of type <see cref="TValue"/> modified by the enum <see cref="TModifier"/>
+/// </summary>
+/// <typeparam name="TValue">The type of the value contained by the <see cref="DateTimeV2Object"/></typeparam>
+/// <typeparam name="TModifier">The type of enum modifier that modifies the <see cref="TValue"/> value</typeparam>
 public abstract class DateTimeV2ObjectWithModValue<TValue, TModifier> : DateTimeV2ObjectWithValue<TValue>
     where TValue : notnull
     where TModifier : Enum
@@ -32,6 +37,9 @@ public abstract class DateTimeV2ObjectWithModValue<TValue, TModifier> : DateTime
         this.InitializeModifier(value);
     }
 
+    /// <summary>
+    /// The modifier modifying the Value
+    /// </summary>
     // ReSharper disable once MemberCanBeProtected.Global
     // ReSharper disable once UnusedAutoPropertyAccessor.Global
     public TModifier Modifier { get; protected set; }

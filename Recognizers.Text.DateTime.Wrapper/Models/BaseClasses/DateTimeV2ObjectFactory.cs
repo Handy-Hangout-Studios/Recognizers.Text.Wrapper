@@ -21,6 +21,9 @@ using System.Collections.Generic;
 
 namespace Recognizers.Text.DateTime.Wrapper.Models.BaseClasses;
 
+/// <summary>
+/// An abstract class to simplify implementation of <see cref="IDateTimeV2ObjectFactory"/>s
+/// </summary>
 public abstract class DateTimeV2ObjectFactory : IDateTimeV2ObjectFactory
 {
     DateTimeV2Object IDateTimeV2ObjectFactory.Create(DateTimeV2Type type, IDictionary<String, String> dict)

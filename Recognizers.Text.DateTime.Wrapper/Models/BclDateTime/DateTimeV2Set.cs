@@ -23,7 +23,6 @@ namespace Recognizers.Text.DateTime.Wrapper.Models.BclDateTime;
 /// <summary>
 ///     A set of Times, DateTimes, etc. Currently, the only way to interact with this is through the usage of the Timex
 ///     property.
-///     For help, please ask in the support server.
 /// </summary>
 public class DateTimeV2Set : DateTimeV2Object
 {

@@ -19,10 +19,10 @@ using System;
 namespace Recognizers.Text.DateTime.Wrapper.Models.Range;
 
 /// <summary>
-///     Represents a range of comparable generics
+///     Represents a range of dates, times, or datetimes
 /// </summary>
 /// <typeparam name="TRangeType">A type for the range.</typeparam>
-/// <typeparam name="TRangeModifier"></typeparam>
+/// <typeparam name="TRangeModifier">The enum modifier modifying how to read a range</typeparam>
 public readonly struct
     DateTimeV2Range<TRangeType, TRangeModifier> : IEquatable<DateTimeV2Range<TRangeType, TRangeModifier>>
     where TRangeType : notnull
@@ -38,6 +38,9 @@ public readonly struct
     /// </summary>
     public TRangeType End { get; }
 
+    /// <summary>
+    ///     The modifier for this <see cref="DateTimeV2Range{TRangeType,TRangeModifier}"/> 
+    /// </summary>
     // ReSharper disable once MemberCanBePrivate.Global
     // ReSharper disable once UnusedAutoPropertyAccessor.Global
     public TRangeModifier Modifier { get; }

@@ -21,8 +21,9 @@ using System.Diagnostics.CodeAnalysis;
 namespace Recognizers.Text.DateTime.Wrapper.Models.BaseClasses;
 
 /// <summary>
-///     The DateTimeV2 objects base class. Contains the Timex expression of the recognized value
+/// A <see cref="DateTimeV2Object"/> containing a value of type <see cref="TValue"/>. 
 /// </summary>
+/// <typeparam name="TValue">The type of the value that this <see cref="DateTimeV2Object"/> contains</typeparam>
 public abstract class DateTimeV2ObjectWithValue<TValue> : DateTimeV2Object,
     IEquatable<DateTimeV2ObjectWithValue<TValue>> where TValue : notnull
 {
@@ -57,7 +58,7 @@ public abstract class DateTimeV2ObjectWithValue<TValue> : DateTimeV2Object,
     ///     Initialize the Value property.
     ///     <para>
     ///         NOTE: Do not rely on any kind of initialized values from derived classes as the constructor for the
-    ///         base classes run before the constructor for derived classes which means that this will not be initialized
+    ///         base classes run before the constructor for derived classes which means that they will not be initialized
     ///         yet
     ///     </para>
     /// </summary>

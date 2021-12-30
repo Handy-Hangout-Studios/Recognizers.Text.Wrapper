@@ -25,6 +25,12 @@ namespace Recognizers.Text.DateTime.Wrapper.Models.BclDateTime;
 /// <summary>
 ///     A DateTime GenericRange with both a Start and End DateTime that contain the start Date and end Date recognized.
 ///     Do not use the Time component of Start or End DateTimes.
+///
+///     If <see cref="DateModifier"/> is <see cref="DateModifier.Before"/> or <see cref="DateModifier.Until"/> then
+///     <see cref="DateTimeV2DateRange.Value"/> has Start set to the minimum possible DateTime
+///
+///     If <see cref="DateModifier"/> is <see cref="DateModifier.Since"/> or <see cref="DateModifier.After"/> then
+///     <see cref="DateTimeV2DateRange.Value"/> has End set to the maximum possible DateTime
 /// </summary>
 public class DateTimeV2DateRange : DateTimeV2ObjectWithValue<DateTimeV2Range<System.DateTime, DateModifier>>
 {
