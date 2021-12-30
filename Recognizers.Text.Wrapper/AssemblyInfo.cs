@@ -16,5 +16,4 @@
 
 using System.Runtime.CompilerServices;
 
-[assembly: InternalsVisibleTo("Recognizers.Text.DateTime.Wrapper.NodaTime")]
-[assembly: InternalsVisibleTo("Recognizers.Text.Wrapper.Test")]
+[assembly: InternalsVisibleTo("Recognizers.Text.DateTime.Wrapper")]

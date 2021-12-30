@@ -14,6 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
@@ -22,7 +23,8 @@ namespace Recognizers.Text.DateTime.Wrapper.Models.BaseClasses;
 /// <summary>
 ///     The DateTimeV2 objects base class. Contains the Timex expression of the recognized value
 /// </summary>
-public abstract class DateTimeV2ObjectWithValue<TValue> : DateTimeV2Object where TValue : notnull
+public abstract class DateTimeV2ObjectWithValue<TValue> : DateTimeV2Object,
+    IEquatable<DateTimeV2ObjectWithValue<TValue>> where TValue : notnull
 {
     protected DateTimeV2ObjectWithValue(IDictionary<string, string> value) : base(value)
     {
@@ -36,6 +38,21 @@ public abstract class DateTimeV2ObjectWithValue<TValue> : DateTimeV2Object where
     /// </summary>
     public TValue Value { get; protected set; }
 
+    public bool Equals(DateTimeV2ObjectWithValue<TValue>? other)
+    {
+        if (ReferenceEquals(null, other))
+        {
+            return false;
+        }
+
+        if (ReferenceEquals(this, other))
+        {
+            return true;
+        }
+
+        return base.Equals(other) && EqualityComparer<TValue>.Default.Equals(this.Value, other.Value);
+    }
+
     /// <summary>
     ///     Initialize the Value property.
     ///     <para>
@@ -47,4 +64,36 @@ public abstract class DateTimeV2ObjectWithValue<TValue> : DateTimeV2Object where
     /// <param name="value">The value dictionary with all components necessary to create a Value object</param>
     [MemberNotNull("Value")]
     protected abstract void InitializeValue(IDictionary<string, string> value);
+
+    public override bool Equals(object? obj)
+    {
+        if (ReferenceEquals(null, obj))
+        {
+            return false;
+        }
+
+        if (ReferenceEquals(this, obj))
+        {
+            return true;
+        }
+
+        if (obj.GetType() != this.GetType())
+        {
+            return false;
+        }
+
+        return this.Equals((DateTimeV2ObjectWithValue<TValue>)obj);
+    }
+
+    public override int GetHashCode()
+    {
+        // ReSharper disable once NonReadonlyMemberInGetHashCode
+        // The value shouldn't ever change after initialization
+        return HashCode.Combine(base.GetHashCode(), this.Value);
+    }
+
+    public override string ToString()
+    {
+        return $"{base.ToString()}\nValue: {this.Value}\n";
+    }
 }

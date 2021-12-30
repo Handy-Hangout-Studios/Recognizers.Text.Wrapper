@@ -15,6 +15,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 using Microsoft.Recognizers.Text.DataTypes.TimexExpression;
+using System;
 using System.Collections.Generic;
 
 namespace Recognizers.Text.DateTime.Wrapper.Models.BaseClasses;
@@ -22,7 +23,7 @@ namespace Recognizers.Text.DateTime.Wrapper.Models.BaseClasses;
 /// <summary>
 ///     The DateTimeV2 objects base class. Contains the Timex expression of the recognized value
 /// </summary>
-public abstract class DateTimeV2Object
+public abstract class DateTimeV2Object : IEquatable<DateTimeV2Object>
 {
     private DateTimeV2Object()
     {
@@ -38,4 +39,49 @@ public abstract class DateTimeV2Object
     ///     The Timex value of the DateTimeV2 object recognized by the recognizer.
     /// </summary>
     public TimexProperty Timex { get; }
+
+    public bool Equals(DateTimeV2Object? other)
+    {
+        if (ReferenceEquals(null, other))
+        {
+            return false;
+        }
+
+        if (ReferenceEquals(this, other))
+        {
+            return true;
+        }
+
+        return this.Timex.TimexValue.Equals(other.Timex.TimexValue);
+    }
+
+    public override bool Equals(object? obj)
+    {
+        if (ReferenceEquals(null, obj))
+        {
+            return false;
+        }
+
+        if (ReferenceEquals(this, obj))
+        {
+            return true;
+        }
+
+        if (obj.GetType() != this.GetType())
+        {
+            return false;
+        }
+
+        return this.Equals((DateTimeV2Object)obj);
+    }
+
+    public override int GetHashCode()
+    {
+        return this.Timex.GetHashCode();
+    }
+
+    public override String ToString()
+    {
+        return $"Timex: {this.Timex}";
+    }
 }

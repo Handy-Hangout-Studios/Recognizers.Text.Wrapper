@@ -30,10 +30,10 @@ public class DateTimeV2Date : DateTimeV2ObjectWithValue<System.DateTime>
 
     protected override void InitializeValue(IDictionary<string, string> value)
     {
-        if (!System.DateTime.TryParseExact(value["value"], "uuuu-MM-dd", null, default,
+        if (!System.DateTime.TryParseExact(value["value"], "yyyy-MM-dd", null, default,
                 out System.DateTime result))
         {
-            throw new ArgumentException($"value {value["value"]} is not in the format uuuu-MM-dd");
+            throw new ArgumentException($"value {value["value"]} is not in the format yyyy-MM-dd");
         }
 
         this.Value = result;

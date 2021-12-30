@@ -16,6 +16,7 @@
 
 using NodaTime;
 using Recognizers.Text.DateTime.Wrapper.Models.BaseClasses;
+using Recognizers.Text.DateTime.Wrapper.Models.Modifiers;
 using System;
 using System.Collections.Generic;
 
@@ -24,9 +25,16 @@ namespace Recognizers.Text.DateTime.Wrapper.NodaTime;
 /// <summary>
 ///     An object containing a <see cref="Duration" /> value containing the number of seconds that were parsed out
 /// </summary>
-public class NodaDateTimeV2Duration : DateTimeV2ObjectWithValue<Duration>
+public class NodaDateTimeV2Duration : DateTimeV2ObjectWithModValue<Duration, DurationModifier>
 {
     internal NodaDateTimeV2Duration(IDictionary<String, String> value) : base(value) { }
+
+    protected override void InitializeModifier(IDictionary<String, String> value)
+    {
+        this.Modifier = value.ContainsKey("Mod")
+            ? Enum.Parse<DurationModifier>(value["Mod"], true)
+            : DurationModifier.None;
+    }
 
     protected override void InitializeValue(IDictionary<String, String> value)
     {

@@ -15,7 +15,8 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 using Recognizers.Text.DateTime.Wrapper.Models.BaseClasses;
-using Recognizers.Text.DateTime.Wrapper.Models.Generics;
+using Recognizers.Text.DateTime.Wrapper.Models.Modifiers;
+using Recognizers.Text.DateTime.Wrapper.Models.Range;
 using System;
 using System.Collections.Generic;
 
@@ -24,24 +25,50 @@ namespace Recognizers.Text.DateTime.Wrapper.Models.BclDateTime;
 /// <summary>
 ///     A DateTime GenericRange Value containing the DateTime start and DateTime end recognized.
 /// </summary>
-internal class DateTimeV2DateTimeRange : DateTimeV2ObjectWithValue<ComparableRange<System.DateTime>>
+internal class DateTimeV2DateTimeRange : DateTimeV2ObjectWithValue<DateTimeV2Range<System.DateTime, DateTimeModifier>>
 {
     internal DateTimeV2DateTimeRange(IDictionary<string, string> value) : base(value) { }
 
     protected override void InitializeValue(IDictionary<String, String> value)
     {
-        if (!System.DateTime.TryParseExact(value["start"], "uuuu-MM-dd HH:mm:ss", null, default,
-                out System.DateTime start))
+        bool parseStart = true;
+        bool parseEnd = true;
+        DateTimeModifier modifier = DateTimeModifier.None;
+        if (value.ContainsKey("Mod"))
         {
-            throw new ArgumentException($"{value["start"]} is not of the format uuuu-MM-dd HH:mm:ss");
+            modifier = Enum.Parse<DateTimeModifier>(value["Mod"], true);
+            switch (modifier)
+            {
+                case DateTimeModifier.None:
+                    break;
+                case DateTimeModifier.Before:
+                case DateTimeModifier.Until:
+                    parseStart = false;
+                    break;
+                case DateTimeModifier.Since:
+                case DateTimeModifier.After:
+                    parseEnd = false;
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(modifier), modifier,
+                        $"{nameof(modifier)} was not a valid DateTimeModifier");
+            }
         }
 
-        if (!System.DateTime.TryParseExact(value["end"], "uuuu-MM-dd HH:mm:ss", null, default,
-                out System.DateTime end))
+        System.DateTime start = System.DateTime.MinValue;
+        if (parseStart && !System.DateTime.TryParseExact(value["start"], "yyyy-MM-dd HH:mm:ss", null, default,
+                out start))
         {
-            throw new ArgumentException($"{value["end"]} is not of the format uuuu-MM-dd HH:mm:ss");
+            throw new ArgumentException($"{value["start"]} is not of the format yyyy-MM-dd HH:mm:ss");
         }
 
-        this.Value = new ComparableRange<System.DateTime>(start, end);
+        System.DateTime end = System.DateTime.MaxValue;
+        if (parseEnd && !System.DateTime.TryParseExact(value["end"], "yyyy-MM-dd HH:mm:ss", null, default,
+                out end))
+        {
+            throw new ArgumentException($"{value["end"]} is not of the format yyyy-MM-dd HH:mm:ss");
+        }
+
+        this.Value = new DateTimeV2Range<System.DateTime, DateTimeModifier>(modifier, start, end);
     }
 }

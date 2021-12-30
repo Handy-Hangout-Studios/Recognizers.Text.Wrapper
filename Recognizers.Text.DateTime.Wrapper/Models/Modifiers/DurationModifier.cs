@@ -14,7 +14,22 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.If not, see <https://www.gnu.org/licenses/>.
 
-using System.Runtime.CompilerServices;
+namespace Recognizers.Text.DateTime.Wrapper.Models.Modifiers;
 
-[assembly: InternalsVisibleTo("Recognizers.Text.DateTime.Wrapper.NodaTime")]
-[assembly: InternalsVisibleTo("Recognizers.Text.Wrapper.Test")]
+public enum DurationModifier
+{
+    /// <summary>
+    ///     The duration should be exactly as long as specified
+    /// </summary>
+    None = 0,
+
+    /// <summary>
+    ///     The duration should be as long as specified or longer
+    /// </summary>
+    More = 1,
+
+    /// <summary>
+    ///     The duration should be as long as specified or shorter
+    /// </summary>
+    Less = 2,
+}

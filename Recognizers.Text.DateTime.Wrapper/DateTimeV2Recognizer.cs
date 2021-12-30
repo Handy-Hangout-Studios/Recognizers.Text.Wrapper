@@ -102,15 +102,11 @@ public class DateTimeV2Recognizer
         List<ModelResult> modelResults =
             !refTime.HasValue ? this._model.Parse(content) : this._model.Parse(content, refTime.Value);
 
-        if (typeFilter is null)
-        {
-            return modelResults
-                .Select(mr => new DateTimeV2Model(mr, this._factory));
-        }
+        IEnumerable<DateTimeV2Model> transformedModels = modelResults
+            .Select(mr => DateTimeV2Model.Create(mr, this._factory))
+            .Where(dtm => dtm is not null)!;
 
-        return modelResults
-            .Select(mr => new DateTimeV2Model(mr, this._factory))
-            .Where(dtm => typeFilter.Contains(dtm.Type));
+        return typeFilter is null ? transformedModels : transformedModels.Where(dtm => typeFilter.Contains(dtm.Type));
     }
 
     /// <summary>

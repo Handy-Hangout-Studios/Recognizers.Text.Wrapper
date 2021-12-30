@@ -17,7 +17,8 @@
 using NodaTime;
 using NodaTime.Text;
 using Recognizers.Text.DateTime.Wrapper.Models.BaseClasses;
-using Recognizers.Text.DateTime.Wrapper.Models.Generics;
+using Recognizers.Text.DateTime.Wrapper.Models.Modifiers;
+using Recognizers.Text.DateTime.Wrapper.Models.Range;
 using System;
 using System.Collections.Generic;
 
@@ -25,28 +26,62 @@ namespace Recognizers.Text.DateTime.Wrapper.NodaTime;
 
 /// <summary>
 /// </summary>
-public class NodaDateTimeV2TimeRange : DateTimeV2ObjectWithValue<ComparableRange<LocalTime>>
+public class NodaDateTimeV2TimeRange : DateTimeV2ObjectWithValue<DateTimeV2Range<LocalTime, TimeModifier>>
 {
     internal NodaDateTimeV2TimeRange(IDictionary<String, String> value) : base(value) { }
 
     protected override void InitializeValue(IDictionary<String, String> value)
     {
+        bool parseStart = true;
+        bool parseEnd = true;
+        TimeModifier modifier = TimeModifier.None;
+        if (value.ContainsKey("Mod"))
+        {
+            modifier = Enum.Parse<TimeModifier>(value["Mod"], true);
+            switch (modifier)
+            {
+                case TimeModifier.None:
+                    break;
+                case TimeModifier.Before:
+                case TimeModifier.Until:
+                    parseStart = false;
+                    break;
+                case TimeModifier.Since:
+                case TimeModifier.After:
+                    parseEnd = false;
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(modifier), modifier,
+                        $"{nameof(modifier)} was not a valid TimeModifier");
+            }
+        }
+
         LocalTimePattern pattern = LocalTimePattern.CreateWithInvariantCulture("HH:mm:ss");
-        ParseResult<LocalTime> startTimeParsed = pattern.Parse(value["start"]);
-        if (!startTimeParsed.TryGetValue(LocalTime.MinValue, out LocalTime startTime))
+
+        LocalTime startTime = LocalTime.MinValue;
+        if (parseStart)
         {
-            throw new ArgumentException(
-                $"Failed to parse start value \"{value["start"]}\" with the format \"HH:mm:ss\"",
-                startTimeParsed.Exception);
+            ParseResult<LocalTime> startTimeParsed = pattern.Parse(value["start"]);
+            if (!startTimeParsed.TryGetValue(LocalTime.MinValue, out startTime))
+            {
+                throw new ArgumentException(
+                    $"Failed to parse start value \"{value["start"]}\" with the format \"HH:mm:ss\"",
+                    startTimeParsed.Exception);
+            }
         }
 
-        ParseResult<LocalTime> endTimeParsed = pattern.Parse(value["end"]);
-        if (!endTimeParsed.TryGetValue(LocalTime.MinValue, out LocalTime endTime))
+        LocalTime endTime = LocalTime.MaxValue;
+        if (parseEnd)
         {
-            throw new ArgumentException($"Failed to parse end value \"{value["end"]}\" with the format \"HH:mm:ss\"",
-                endTimeParsed.Exception);
+            ParseResult<LocalTime> endTimeParsed = pattern.Parse(value["end"]);
+            if (!endTimeParsed.TryGetValue(LocalTime.MinValue, out endTime))
+            {
+                throw new ArgumentException(
+                    $"Failed to parse end value \"{value["end"]}\" with the format \"HH:mm:ss\"",
+                    endTimeParsed.Exception);
+            }
         }
 
-        this.Value = new ComparableRange<LocalTime>(startTime, endTime);
+        this.Value = new DateTimeV2Range<LocalTime, TimeModifier>(modifier, startTime, endTime);
     }
 }

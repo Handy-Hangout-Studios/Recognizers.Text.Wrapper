@@ -17,7 +17,6 @@
 using Microsoft.Recognizers.Text;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 
 namespace Recognizers.Text.Wrapper;
 
@@ -28,9 +27,9 @@ namespace Recognizers.Text.Wrapper;
 /// </summary>
 /// <typeparam name="TResolution">The Type of Resolution that is being used here</typeparam>
 /// <typeparam name="TEnum">The Enum representing the types used for this kind of Recognizer Object</typeparam>
-public abstract class RecognizerObjectModel<TResolution, TEnum>
+public abstract class RecognizerObjectModel<TResolution, TEnum> : IEquatable<RecognizerObjectModel<TResolution, TEnum>>
     where TEnum : Enum
-    where TResolution : notnull, Resolution
+    where TResolution : Resolution
 {
     /// <summary>
     ///     This is never used. If it is used, something is wrong. It's private because it should never be used.
@@ -49,15 +48,13 @@ public abstract class RecognizerObjectModel<TResolution, TEnum>
     ///     InitializeResolution to initialize both of those properties.
     /// </summary>
     /// <param name="modelResult">The Microsoft Recognizer provided ModelResult</param>
-    protected RecognizerObjectModel(ModelResult modelResult)
+    protected RecognizerObjectModel(ModelResult modelResult, TEnum type, TResolution resolution)
     {
         this.Text = modelResult.Text;
         this.Start = modelResult.Start;
         this.End = modelResult.End;
-        // ReSharper disable twice VirtualMemberCallInConstructor
-        // This will not cause problems as any initialization should not rely on other initialized values in the object.
-        this.InitializeType(modelResult.TypeName);
-        this.InitializeResolution(modelResult.Resolution);
+        this.Type = type;
+        this.Resolution = resolution;
     }
 
     /// <summary>
@@ -78,34 +75,60 @@ public abstract class RecognizerObjectModel<TResolution, TEnum>
     /// <summary>
     ///     The type of Resolution found.
     /// </summary>
-    public TEnum Type { get; protected set; }
+    public TEnum Type { get; protected init; }
 
     /// <summary>
     ///     The resolution that was found.
     /// </summary>
-    public TResolution Resolution { get; protected set; }
+    public TResolution Resolution { get; protected init; }
 
-    /// <summary>
-    ///     Initialize the Resolution Field with a nonnull value
-    ///     <para>
-    ///         NOTE: Do not rely on any kind of initialized values from derived classes as the constructor for the
-    ///         base classes run before the constructor for derived classes which means that this will not be initialized
-    ///         yet
-    ///     </para>
-    /// </summary>
-    /// <param name="resolution">The dictionary of objects resolved from the model results</param>
-    [MemberNotNull("Resolution")]
-    protected abstract void InitializeResolution(IDictionary<string, object> resolution);
+    public bool Equals(RecognizerObjectModel<TResolution, TEnum>? other)
+    {
+        if (ReferenceEquals(null, other))
+        {
+            return false;
+        }
 
-    /// <summary>
-    ///     Initialize the Type Field with a nonnull value
-    ///     <para>
-    ///         NOTE: Do not rely on any kind of initialized values from derived classes as the constructor for the
-    ///         base classes run before the constructor for derived classes which means that this will not be initialized
-    ///         yet
-    ///     </para>
-    /// </summary>
-    /// <param name="typename">The typename extracted from the model results</param>
-    [MemberNotNull("Type")]
-    protected abstract void InitializeType(string typename);
+        if (ReferenceEquals(this, other))
+        {
+            return true;
+        }
+
+        return string.Equals(this.Text, other.Text, StringComparison.OrdinalIgnoreCase) &&
+               this.Start == other.Start &&
+               this.End == other.End &&
+               EqualityComparer<TEnum>.Default.Equals(this.Type, other.Type) &&
+               this.Resolution.Equals(other.Resolution);
+    }
+
+    public override bool Equals(object? obj)
+    {
+        if (ReferenceEquals(null, obj))
+        {
+            return false;
+        }
+
+        if (ReferenceEquals(this, obj))
+        {
+            return true;
+        }
+
+        if (obj.GetType() != this.GetType())
+        {
+            return false;
+        }
+
+        return this.Equals((RecognizerObjectModel<TResolution, TEnum>)obj);
+    }
+
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(this.Text, this.Start, this.End, this.Type, this.Resolution);
+    }
+
+    public override String ToString()
+    {
+        return
+            $"==================\nText: {this.Text}\nStart: {this.Start}\nEnd: {this.End}\nResolution\n==================\n{this.Resolution}\n==================";
+    }
 }

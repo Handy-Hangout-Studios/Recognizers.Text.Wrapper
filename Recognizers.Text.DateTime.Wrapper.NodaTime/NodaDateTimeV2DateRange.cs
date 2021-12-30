@@ -17,41 +17,75 @@
 using NodaTime;
 using NodaTime.Text;
 using Recognizers.Text.DateTime.Wrapper.Models.BaseClasses;
-using Recognizers.Text.DateTime.Wrapper.Models.Generics;
+using Recognizers.Text.DateTime.Wrapper.Models.Modifiers;
+using Recognizers.Text.DateTime.Wrapper.Models.Range;
 using System;
 using System.Collections.Generic;
 
 namespace Recognizers.Text.DateTime.Wrapper.NodaTime;
 
 /// <summary>
-///     A DateTime <see cref="ComparableRange{TRangeType}" /> with both a Start and End LocalDate that contain the start
+///     A DateTime <see cref="DateTimeV2Range{TRangeType,TRangeModifier}" /> with both a Start and End LocalDate that
+///     contain the start
 ///     LocalDate \
 ///     and end LocalDate recognized.
 /// </summary>
-public class NodaDateTimeV2DateRange : DateTimeV2ObjectWithValue<ComparableRange<LocalDate>>
+public class NodaDateTimeV2DateRange : DateTimeV2ObjectWithValue<DateTimeV2Range<LocalDate, DateModifier>>
 {
     internal NodaDateTimeV2DateRange(IDictionary<string, string> value) : base(value) { }
 
     protected override void InitializeValue(IDictionary<string, string> value)
     {
+        bool parseStart = true;
+        bool parseEnd = true;
+        DateModifier modifier = DateModifier.None;
+        if (value.ContainsKey("Mod"))
+        {
+            modifier = Enum.Parse<DateModifier>(value["Mod"], true);
+            switch (modifier)
+            {
+                case DateModifier.None:
+                    break;
+                case DateModifier.Before:
+                case DateModifier.Until:
+                    parseStart = false;
+                    break;
+                case DateModifier.Since:
+                case DateModifier.After:
+                    parseEnd = false;
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(modifier), modifier,
+                        $"{nameof(modifier)} was not a valid DateModifier");
+            }
+        }
+
         LocalDatePattern pattern = LocalDatePattern.CreateWithInvariantCulture("uuuu-MM-dd");
-        ParseResult<LocalDate> startDateParsed = pattern.Parse(value["start"]);
-        if (!startDateParsed.TryGetValue(LocalDate.MinIsoValue, out LocalDate startDate))
+        LocalDate startDate = LocalDate.MinIsoValue;
+        if (parseStart)
         {
-            throw new ArgumentException(
-                $"Failed to parse the start value \"{value["start"]}\" with the expected format \"uuuu-MM-dd\"",
-                startDateParsed.Exception);
+            ParseResult<LocalDate> startDateParsed = pattern.Parse(value["start"]);
+            if (!startDateParsed.TryGetValue(LocalDate.MinIsoValue, out startDate))
+            {
+                throw new ArgumentException(
+                    $"Failed to parse the start value \"{value["start"]}\" with the expected format \"uuuu-MM-dd\"",
+                    startDateParsed.Exception);
+            }
         }
 
-        ParseResult<LocalDate> endDateParsed = pattern.Parse(value["end"]);
-        if (!endDateParsed.TryGetValue(LocalDate.MinIsoValue, out LocalDate endDate))
+        LocalDate endDate = LocalDate.MaxIsoValue;
+        if (parseEnd)
         {
-            throw new ArgumentException(
-                $"Failed to parse the end value \"{value["end"]}\" with the expected format \"uuuu-MM-dd\"",
-                endDateParsed.Exception);
+            ParseResult<LocalDate> endDateParsed = pattern.Parse(value["end"]);
+            if (!endDateParsed.TryGetValue(LocalDate.MinIsoValue, out endDate))
+            {
+                throw new ArgumentException(
+                    $"Failed to parse the end value \"{value["end"]}\" with the expected format \"uuuu-MM-dd\"",
+                    endDateParsed.Exception);
+            }
         }
 
 
-        this.Value = new ComparableRange<LocalDate>(startDate, endDate);
+        this.Value = new DateTimeV2Range<LocalDate, DateModifier>(modifier, startDate, endDate);
     }
 }

@@ -15,6 +15,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 using Recognizers.Text.DateTime.Wrapper.Models.BaseClasses;
+using Recognizers.Text.DateTime.Wrapper.Models.Modifiers;
 using System;
 using System.Collections.Generic;
 
@@ -23,11 +24,17 @@ namespace Recognizers.Text.DateTime.Wrapper.Models.BclDateTime;
 /// <summary>
 ///     A TimeSpan Value that specifies how long the duration recognized lasts.
 /// </summary>
-public class DateTimeV2Duration : DateTimeV2ObjectWithValue<TimeSpan>
+public class DateTimeV2Duration : DateTimeV2ObjectWithModValue<TimeSpan, DurationModifier>
 {
     internal DateTimeV2Duration(IDictionary<String, String> value) : base(value)
     {
-        this.Value = TimeSpan.FromSeconds(long.Parse(value["value"]));
+    }
+
+    protected override void InitializeModifier(IDictionary<String, String> value)
+    {
+        this.Modifier = value.ContainsKey("Mod")
+            ? Enum.Parse<DurationModifier>(value["Mod"], true)
+            : DurationModifier.None;
     }
 
     protected override void InitializeValue(IDictionary<String, String> value)

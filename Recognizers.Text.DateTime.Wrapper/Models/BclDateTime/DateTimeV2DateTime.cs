@@ -29,10 +29,10 @@ public class DateTimeV2DateTime : DateTimeV2ObjectWithValue<System.DateTime>
 
     protected override void InitializeValue(IDictionary<String, String> value)
     {
-        if (!System.DateTime.TryParseExact(value["value"], "uuuu-MM-dd HH:mm:ss", null, default,
+        if (!System.DateTime.TryParseExact(value["value"], "yyyy-MM-dd HH:mm:ss", null, default,
                 out System.DateTime result))
         {
-            throw new ArgumentException($"value {value["value"]} is not of the format uuuu-MM-dd HH:mm:ss");
+            throw new ArgumentException($"value {value["value"]} is not of the format yyyy-MM-dd HH:mm:ss");
         }
 
         this.Value = result;

@@ -14,8 +14,11 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+using System;
+
 namespace Recognizers.Text.Wrapper;
 
-public class Resolution
+public abstract class Resolution : IEquatable<Resolution>
 {
+    public abstract Boolean Equals(Resolution? other);
 }

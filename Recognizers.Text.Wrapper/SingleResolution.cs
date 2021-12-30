@@ -15,6 +15,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 using System;
+using System.Collections.Generic;
 
 namespace Recognizers.Text.Wrapper;
 
@@ -23,7 +24,7 @@ namespace Recognizers.Text.Wrapper;
 /// </summary>
 /// <typeparam name="TValue">The Type of value that is being returned for this Resolution</typeparam>
 /// <typeparam name="TSubType">The Types that are available for this kind of resolution</typeparam>
-public sealed class SingleResolution<TValue, TSubType> : Resolution
+public sealed class SingleResolution<TValue, TSubType> : Resolution, IEquatable<SingleResolution<TValue, TSubType>>
     where TSubType : Enum
 {
     public SingleResolution(TValue value, TSubType subtype)
@@ -41,4 +42,35 @@ public sealed class SingleResolution<TValue, TSubType> : Resolution
     ///     The value of the resolution.
     /// </summary>
     public TValue Value { get; }
+
+    public bool Equals(SingleResolution<TValue, TSubType>? other)
+    {
+        if (ReferenceEquals(null, other))
+        {
+            return false;
+        }
+
+        if (ReferenceEquals(this, other))
+        {
+            return true;
+        }
+
+        return EqualityComparer<TSubType>.Default.Equals(this.SubType, other.SubType) &&
+               EqualityComparer<TValue>.Default.Equals(this.Value, other.Value);
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return ReferenceEquals(this, obj) || (obj is SingleResolution<TValue, TSubType> other && this.Equals(other));
+    }
+
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(this.SubType, this.Value);
+    }
+
+    public override Boolean Equals(Resolution? other)
+    {
+        return !ReferenceEquals(null, other) && this.Equals((object)other);
+    }
 }

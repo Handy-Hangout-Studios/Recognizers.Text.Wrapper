@@ -17,7 +17,8 @@
 using NodaTime;
 using NodaTime.Text;
 using Recognizers.Text.DateTime.Wrapper.Models.BaseClasses;
-using Recognizers.Text.DateTime.Wrapper.Models.Generics;
+using Recognizers.Text.DateTime.Wrapper.Models.Modifiers;
+using Recognizers.Text.DateTime.Wrapper.Models.Range;
 using System;
 using System.Collections.Generic;
 
@@ -26,29 +27,62 @@ namespace Recognizers.Text.DateTime.Wrapper.NodaTime;
 /// <summary>
 ///     A DateTime DateTimeV2Range Value containing the LocalDateTime start and LocalDateTime end recognized.
 /// </summary>
-internal class NodaDateTimeV2DateTimeRange : DateTimeV2ObjectWithValue<ComparableRange<LocalDateTime>>
+internal class NodaDateTimeV2DateTimeRange : DateTimeV2ObjectWithValue<DateTimeV2Range<LocalDateTime, DateTimeModifier>>
 {
     internal NodaDateTimeV2DateTimeRange(IDictionary<string, string> value) : base(value) { }
 
     protected override void InitializeValue(IDictionary<String, String> value)
     {
+        bool parseStart = true;
+        bool parseEnd = true;
+        DateTimeModifier modifier = DateTimeModifier.None;
+        if (value.ContainsKey("Mod"))
+        {
+            modifier = Enum.Parse<DateTimeModifier>(value["Mod"], true);
+            switch (modifier)
+            {
+                case DateTimeModifier.None:
+                    break;
+                case DateTimeModifier.Before:
+                case DateTimeModifier.Until:
+                    parseStart = false;
+                    break;
+                case DateTimeModifier.Since:
+                case DateTimeModifier.After:
+                    parseEnd = false;
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(modifier), modifier,
+                        $"{nameof(modifier)} was not a valid DateTimeModifier");
+            }
+        }
+
         LocalDateTimePattern pattern = LocalDateTimePattern.CreateWithInvariantCulture("uuuu-MM-dd HH:mm:ss");
-        ParseResult<LocalDateTime> startDateTimeParsed = pattern.Parse(value["start"]);
-        if (!startDateTimeParsed.TryGetValue(LocalDate.MinIsoValue + LocalTime.MinValue, out LocalDateTime startDate))
+
+        LocalDateTime startDate = LocalDate.MinIsoValue + LocalTime.Midnight;
+        if (parseStart)
         {
-            throw new ArgumentException(
-                $"Failed to parse the start value \"{value["start"]}\" with the format \"uuuu-MM-dd HH:mm:ss\"",
-                startDateTimeParsed.Exception);
+            ParseResult<LocalDateTime> startDateTimeParsed = pattern.Parse(value["start"]);
+            if (!startDateTimeParsed.TryGetValue(LocalDate.MinIsoValue + LocalTime.MinValue, out startDate))
+            {
+                throw new ArgumentException(
+                    $"Failed to parse the start value \"{value["start"]}\" with the format \"uuuu-MM-dd HH:mm:ss\"",
+                    startDateTimeParsed.Exception);
+            }
         }
 
-        ParseResult<LocalDateTime> endDateTimeParsed = pattern.Parse(value["end"]);
-        if (!endDateTimeParsed.TryGetValue(LocalDate.MinIsoValue + LocalTime.MinValue, out LocalDateTime endDate))
+        LocalDateTime endDate = LocalDate.MaxIsoValue + LocalTime.Midnight;
+        if (parseEnd)
         {
-            throw new ArgumentException(
-                $"Failed to parse the end value \"{value["end"]}\" with the format \"uuuu-MM-dd HH:mm:ss\"",
-                endDateTimeParsed.Exception);
+            ParseResult<LocalDateTime> endDateTimeParsed = pattern.Parse(value["end"]);
+            if (!endDateTimeParsed.TryGetValue(LocalDate.MinIsoValue + LocalTime.MinValue, out endDate))
+            {
+                throw new ArgumentException(
+                    $"Failed to parse the end value \"{value["end"]}\" with the format \"uuuu-MM-dd HH:mm:ss\"",
+                    endDateTimeParsed.Exception);
+            }
         }
 
-        this.Value = new ComparableRange<LocalDateTime>(startDate, endDate);
+        this.Value = new DateTimeV2Range<LocalDateTime, DateTimeModifier>(modifier, startDate, endDate);
     }
 }

@@ -16,7 +16,6 @@
 
 using Recognizers.Text.DateTime.Wrapper.Models.BaseClasses;
 using Recognizers.Text.DateTime.Wrapper.Models.Enums;
-using Recognizers.Text.DateTime.Wrapper.Models.Interfaces;
 using System;
 using System.Collections.Generic;
 
@@ -25,21 +24,45 @@ namespace Recognizers.Text.DateTime.Wrapper.Models.BclDateTime;
 /// <summary>
 ///     A factory to produce the appropriate BCL DateTime .NET objects for each <see cref="DateTimeV2Type" />.
 /// </summary>
-public sealed class BclDateTimeV2ObjectFactory : IDateTimeV2ObjectFactory
+public sealed class BclDateTimeV2ObjectFactory : DateTimeV2ObjectFactory
 {
-    DateTimeV2Object IDateTimeV2ObjectFactory.Create(DateTimeV2Type type, IDictionary<String, String> dict)
+    protected override DateTimeV2Object CreateDate(IDictionary<String, String> dict)
     {
-        return type switch
-        {
-            DateTimeV2Type.Date => new DateTimeV2Date(dict),
-            DateTimeV2Type.DateRange => new DateTimeV2DateRange(dict),
-            DateTimeV2Type.DateTime => new DateTimeV2DateTime(dict),
-            DateTimeV2Type.DateTimeRange => new DateTimeV2DateTimeRange(dict),
-            DateTimeV2Type.Duration => new DateTimeV2Duration(dict),
-            DateTimeV2Type.Set => new DateTimeV2Set(dict),
-            DateTimeV2Type.Time => new DateTimeV2Time(dict),
-            DateTimeV2Type.TimeRange => new DateTimeV2TimeRange(dict),
-            object o => throw new ArgumentException($"{o} is not a recognized datetime V2 type"),
-        };
+        return new DateTimeV2Date(dict);
+    }
+
+    protected override DateTimeV2Object CreateDateRange(IDictionary<String, String> dict)
+    {
+        return new DateTimeV2DateRange(dict);
+    }
+
+    protected override DateTimeV2Object CreateDateTime(IDictionary<String, String> dict)
+    {
+        return new DateTimeV2DateTime(dict);
+    }
+
+    protected override DateTimeV2Object CreateDateTimeRange(IDictionary<String, String> dict)
+    {
+        return new DateTimeV2DateTimeRange(dict);
+    }
+
+    protected override DateTimeV2Object CreateDuration(IDictionary<String, String> dict)
+    {
+        return new DateTimeV2Duration(dict);
+    }
+
+    protected override DateTimeV2Object CreateSet(IDictionary<String, String> dict)
+    {
+        return new DateTimeV2Set(dict);
+    }
+
+    protected override DateTimeV2Object CreateTime(IDictionary<String, String> dict)
+    {
+        return new DateTimeV2Time(dict);
+    }
+
+    protected override DateTimeV2Object CreateTimeRange(IDictionary<String, String> dict)
+    {
+        return new DateTimeV2TimeRange(dict);
     }
 }

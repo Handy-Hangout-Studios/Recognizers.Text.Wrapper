@@ -16,14 +16,17 @@
 
 using System;
 
-namespace Recognizers.Text.DateTime.Wrapper.Models.Generics;
+namespace Recognizers.Text.DateTime.Wrapper.Models.Range;
 
 /// <summary>
 ///     Represents a range of comparable generics
 /// </summary>
 /// <typeparam name="TRangeType">A type for the range.</typeparam>
-public struct ComparableRange<TRangeType> : IEquatable<ComparableRange<TRangeType>>
-    where TRangeType : notnull, IComparable<TRangeType>
+/// <typeparam name="TRangeModifier"></typeparam>
+public readonly struct
+    DateTimeV2Range<TRangeType, TRangeModifier> : IEquatable<DateTimeV2Range<TRangeType, TRangeModifier>>
+    where TRangeType : notnull
+    where TRangeModifier : Enum
 {
     /// <summary>
     ///     Start of the range of generics
@@ -35,25 +38,23 @@ public struct ComparableRange<TRangeType> : IEquatable<ComparableRange<TRangeTyp
     /// </summary>
     public TRangeType End { get; }
 
-    public ComparableRange(TRangeType start, TRangeType end)
-    {
-        if (start.CompareTo(end) > 0)
-        {
-            throw new ArgumentException($"{start} is greater than {end} which is not supported");
-        }
+    public TRangeModifier Modifier { get; }
 
+    public DateTimeV2Range(TRangeModifier mod, TRangeType start, TRangeType end)
+    {
+        this.Modifier = mod;
         this.Start = start;
         this.End = end;
     }
 
-    public bool Equals(ComparableRange<TRangeType> other)
+    public bool Equals(DateTimeV2Range<TRangeType, TRangeModifier> other)
     {
         return this.Start.Equals(other.Start) && this.End.Equals(other.End);
     }
 
     public override bool Equals(object? obj)
     {
-        if (obj is ComparableRange<TRangeType> second)
+        if (obj is DateTimeV2Range<TRangeType, TRangeModifier> second)
         {
             return this.Equals(second);
         }
@@ -66,13 +67,20 @@ public struct ComparableRange<TRangeType> : IEquatable<ComparableRange<TRangeTyp
         return HashCode.Combine(this.Start, this.End);
     }
 
-    public static bool operator ==(ComparableRange<TRangeType> left, ComparableRange<TRangeType> right)
+    public static bool operator ==(DateTimeV2Range<TRangeType, TRangeModifier> left,
+        DateTimeV2Range<TRangeType, TRangeModifier> right)
     {
         return left.Equals(right);
     }
 
-    public static bool operator !=(ComparableRange<TRangeType> left, ComparableRange<TRangeType> right)
+    public static bool operator !=(DateTimeV2Range<TRangeType, TRangeModifier> left,
+        DateTimeV2Range<TRangeType, TRangeModifier> right)
     {
         return !(left == right);
+    }
+
+    public override String ToString()
+    {
+        return $"[{this.Start}, {this.End}]";
     }
 }
