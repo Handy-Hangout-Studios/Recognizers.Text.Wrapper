@@ -1,3 +1,9 @@
+[![Publish to NuGet Workflow](https://github.com/Handy-Hangout-Studios/Recognizers.Text.Wrapper/actions/workflows/nuget_publish.yml/badge.svg)](https://github.com/Handy-Hangout-Studios/Recognizers.Text.Wrapper/actions/workflows/nuget_publish.yml)
+[![](https://tokei.rs/b1/github/Handy-Hangout-Studios/Recognizers.Text.Wrapper?category=code)](https://github.com/Handy-Hangout-Studios/Recognizers.Text.Wrapper)
+[![](https://tokei.rs/b1/github/Handy-Hangout-Studios/Recognizers.Text.Wrapper?category=blanks)](https://github.com/Handy-Hangout-Studios/Recognizers.Text.Wrapper)
+[![](https://tokei.rs/b1/github/Handy-Hangout-Studios/Recognizers.Text.Wrapper?category=files)](https://github.com/Handy-Hangout-Studios/Recognizers.Text.Wrapper)
+[![](https://tokei.rs/b1/github/Handy-Hangout-Studios/Recognizers.Text.Wrapper?category=lines)](https://github.com/Handy-Hangout-Studios/Recognizers.Text.Wrapper)
+[![](https://tokei.rs/b1/github/Handy-Hangout-Studios/Recognizers.Text.Wrapper?category=comments)](https://github.com/Handy-Hangout-Studios/Recognizers.Text.Wrapper)
 # Recognizers.Text.Wrapper
 
 This library is a wrapper around the Microsoft.Recognizers.Text Library
